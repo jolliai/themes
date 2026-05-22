@@ -77,9 +77,9 @@ const navbar = (
 
 const footer = ${footerJsx}
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning style={{'--w-brand-color': '${accentColor}', '--w-font-family': "'Inter', ui-sans-serif, system-ui, sans-serif"}}>
+    <html lang="en" dir="ltr" suppressHydrationWarning style={{'--w-brand-color': '${accentColor}', '--w-font-family': "'Inter', ui-sans-serif, system-ui, sans-serif"} as React.CSSProperties}>
       <Head />
       <body>
         <div className="flux-sidebar-logo">

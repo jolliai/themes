@@ -253,14 +253,14 @@ body:has(.forge-sidebar-tabs) .nextra-sidebar > div:first-child {
 }
 
 /* Hide Nextra's navbar page-tabs (the SidebarTabs component handles it) */
-.nextra-scrollbar:has(> a[href]) {
+.nextra-scrollbar:has(> a[href]):not(.nextra-search-results) {
   display: none !important;
 }
 
 @media (max-width: 767px) {
   .forge-sidebar-tabs { display: none; }
   /* On mobile, restore Nextra navbar page-tabs (hamburger menu) */
-  .nextra-scrollbar:has(> a[href]) {
+  .nextra-scrollbar:has(> a[href]):not(.nextra-search-results) {
     display: flex !important;
   }
 }
@@ -393,7 +393,7 @@ img.forge-logo-dark { display: none !important; }
 }
 
 /* Extra padding when page-tabs are present in the sidebar */
-body:has(.nextra-scrollbar:has(> a[href]) > a) .nextra-sidebar > div:first-child {
+body:has(.nextra-scrollbar:has(> a[href]):not(.nextra-search-results) > a) .nextra-sidebar > div:first-child {
   padding-top: calc(var(--nextra-navbar-height) + 6.25rem) !important;
 }
 
@@ -421,6 +421,14 @@ body > [role="dialog"][aria-modal="true"]:has([role="listbox"]) {
   z-index: 9999 !important;
   min-width: 480px !important;
   max-width: calc(100vw - 2rem) !important;
+}
+
+/* Same intent as the rules above, but matches the popover element directly.
+   Nextra v4 portals the search popover into
+   body > #headlessui-portal-root > div > .nextra-search-results, so the
+   "body > ..." direct-child selectors above never match in current Nextra. */
+.nextra-search-results {
+  z-index: 1000 !important;
 }
 
 body > [class*="rounded-xl"][class*="shadow-xl"] li > a,

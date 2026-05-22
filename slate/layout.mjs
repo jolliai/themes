@@ -66,7 +66,7 @@ export const metadata = {
 const navbar = <Navbar logo={<b style={{ color: 'var(--slate-green)', fontSize: '1.125rem' }}>{${title}}</b>} />
 const footer = ${footerJsx}
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head color={{ hue: ${manifest.defaults.primaryHue}, saturation: 100 }}>

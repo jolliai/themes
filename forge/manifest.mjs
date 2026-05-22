@@ -4,7 +4,7 @@
 
 const manifest = {
 	name: "forge",
-	version: "1.0.0",
+	version: "1.0.1",
 	displayName: "Forge",
 	tagline: "Clean developer docs",
 	defaults: {

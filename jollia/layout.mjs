@@ -34,7 +34,7 @@ export const metadata = {
 const navbar = <Navbar logo={<b style={{ color: 'var(--jolli-green)', fontSize: '1.125rem' }}>{${title}}</b>}>${primaryButton}</Navbar>
 const footer = <Footer>MIT {new Date().getFullYear()} © Jolli.</Footer>
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head color={{ hue: ${manifest.defaults.primaryHue}, saturation: 82 }}>

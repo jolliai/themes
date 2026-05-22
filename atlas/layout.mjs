@@ -256,7 +256,7 @@ const SiteLogo = () => (
 const navbar = ${primaryButton ? `<Navbar logo={<SiteLogo />}>${primaryButton}</Navbar>` : `<Navbar logo={<SiteLogo />} />`}
 const footer = ${footerJsx}
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" dir="ltr" suppressHydrationWarning>
       <Head color={{ hue: ${primaryHue}, saturation: 70 }}>

@@ -2249,6 +2249,14 @@ body > [class*="z-30"][class*="rounded"] {
   z-index: 200 !important;
 }
 
+/* Same intent as the rules above, but matches the popover element directly.
+   Nextra v4 portals the search popover into
+   body > #headlessui-portal-root > div > .nextra-search-results, so the
+   "body > ..." direct-child selectors above never match in current Nextra. */
+.nextra-search-results {
+  z-index: 200 !important;
+}
+
 @media (max-width: 767px) {
   .flux-sidebar-search { display: none; }
 }

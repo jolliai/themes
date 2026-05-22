@@ -114,6 +114,14 @@ body {
   padding: 0 0.3rem !important;
 }
 
+/* Lift the search results popover above .nextra-sidebar (z-index: 35).
+   Nextra portals the popover into body > #headlessui-portal-root, so its
+   default z-index (30) is below the fixed sidebar and the popover gets
+   hidden under the nav menu. */
+.nextra-search-results {
+  z-index: 50 !important;
+}
+
 /* ═══════════════════════════════════════════════════════════
    SIDEBAR NAV
    ═══════════════════════════════════════════════════════════ */

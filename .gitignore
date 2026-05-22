@@ -1,24 +1,6 @@
-# OS
-.DS_Store
-Thumbs.db
-
-# Editor / IDE
-.vscode/
-.idea/
-*.swp
-*~
-
-# Node
-node_modules/
-
-# Environment
-.env
-.env.*
-
-# Jolli / AI tools
 .jolli/
-.claude/
-.kiro/
 .gemini/
-.codex/
-.opencode/
+.claude/
+*.jolli
+*.gemini
+*.claude

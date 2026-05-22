@@ -1,13 +1,14 @@
 /**
- * Forge theme CSS — clean developer-docs visual style.
+ * Forge theme CSS.
  *
- * Sidebar-dominant layout, navbar reduced to search + theme switch,
- * five-column desktop grid, Inter typography, hairline borders.
+ * Emits the shared component styles from ./components.mjs followed by
+ * Forge-specific design tokens and theme-prefixed layout selectors.
  */
 
 import manifest from "./manifest.mjs";
+import COMPONENTS_CSS from "./components.mjs";
 
-// ── Hex-to-HSL conversion (inlined from ColorUtils.ts) ─────────────────────
+// ── Hex-to-HSL conversion ───────────────────────────────────────────────────
 
 function parseHex(hex) {
 	let h = hex.startsWith("#") ? hex.slice(1) : hex;
@@ -46,17 +47,11 @@ function hexToHsl(hex) {
 }
 
 function resolveAccent(theme, defaultHue, defaultSat, defaultLit) {
-	const colors = theme?.colors;
-	if (colors?.primary) {
-		const primary = hexToHsl(colors.primary);
-		if (primary) {
-			return {
-				hue: primary.h,
-				saturation: primary.s,
-				lightness: primary.l,
-				light: colors.light ? hexToHsl(colors.light) : undefined,
-				dark: colors.dark ? hexToHsl(colors.dark) : undefined,
-			};
+	const primary = theme?.primaryColor ?? theme?.colors?.primary;
+	if (primary) {
+		const hsl = hexToHsl(primary);
+		if (hsl) {
+			return { hue: hsl.h, saturation: hsl.s, lightness: hsl.l };
 		}
 	}
 	const hue = theme?.primaryHue ?? defaultHue;
@@ -66,29 +61,19 @@ function resolveAccent(theme, defaultHue, defaultSat, defaultLit) {
 // ── Font config ─────────────────────────────────────────────────────────────
 
 const FONT_CONFIG = {
-	inter: {
-		cssFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-	},
-	"space-grotesk": {
-		cssFamily: "'Space Grotesk', -apple-system, sans-serif",
-	},
-	"ibm-plex": {
-		cssFamily: "'IBM Plex Sans', -apple-system, sans-serif",
-	},
-	"source-sans": {
-		cssFamily: "'Source Sans 3', -apple-system, sans-serif",
-	},
-	"source-serif": {
-		cssFamily: "'Source Serif 4', 'Iowan Old Style', Georgia, serif",
-	},
+	geist: "'Geist', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+	inter: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+	"space-grotesk": "'Space Grotesk', -apple-system, sans-serif",
+	"ibm-plex": "'IBM Plex Sans', -apple-system, sans-serif",
+	"source-sans": "'Source Sans 3', -apple-system, sans-serif",
+	"source-serif": "'Source Serif 4', 'Iowan Old Style', Georgia, serif",
 };
 
-// ── Base CSS ────────────────────────────────────────────────────────────────
+// ── Per-theme CSS ───────────────────────────────────────────────────────────
 
-const FORGE_BASE_CSS = `/*
- * Forge Theme
- * To retheme: override the --header-* and --nav-* variables only.
- * Everything else derives from those + the general palette.
+const FORGE_THEME_CSS = `/*
+ * Forge Theme — design tokens and layout selectors.
+ * Shared component styles live in ./components.mjs (prepended above).
  */
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -103,21 +88,41 @@ const FORGE_BASE_CSS = `/*
   --nextra-bg: 255 255 255;
   --nextra-navbar-height: 54px;
 
+  /* --w-font-family is set inline on <html> by layout.mjs.
+     --w-brand-color is also set inline whenever a site config provides
+     \`primaryColor\`; this default keeps the token populated otherwise so
+     \`--w-accent\` (and everything that derives from it) doesn't fall
+     back to \`unset\`. We derive it from the same --nextra-primary-* HSL
+     trio above, which buildForgeOverrides keeps in sync with config —
+     that way Nextra's internals and the Forge tokens share one source
+     of truth, and the Forge default (hue 228 = blue per manifest) shows
+     through whenever a site doesn't configure its own accent. */
+  --w-brand-color:   hsl(var(--nextra-primary-hue) var(--nextra-primary-saturation) var(--nextra-primary-lightness));
+
   /* ── Accent ─────────────────────────────────────────── */
-  --forge-accent:        hsl(228 84% 61%);
-  --forge-accent-soft:   hsl(228 84% 96%);
-  --forge-accent-border: hsl(228 84% 75%);
+  --w-accent:        var(--w-brand-color);
+  --w-accent-soft:   color-mix(in srgb, var(--w-accent) 10%, white);
+  --w-accent-border: color-mix(in srgb, var(--w-accent) 32%, white);
 
   /* ── General palette ────────────────────────────────── */
-  --forge-bg:            #ffffff;
-  --forge-sidebar-bg:    #f9fafb;
-  --forge-border:        #e5e7eb;
-  --forge-border-soft:   #f3f4f6;
-  --forge-text-strong:   #111827;
-  --forge-text:          #374151;
-  --forge-text-soft:     #6b7280;
-  --forge-text-faint:    #9ca3af;
-  --forge-hover-bg:      #f9fafb;
+  --w-bg:            #ffffff;
+  --w-border:        #e5e7eb;
+  --w-border-soft:   #f3f4f6;
+  --w-text-strong:   #111827;
+  --w-text:          #374151;
+  --w-text-soft:     #6b7280;
+  --w-text-faint:    #9ca3af;
+  --w-hover-bg:      #f9fafb;
+
+  /* ── Component colour tokens ────────────────────────── */
+  --w-code-bg:             #f8fafc;
+  --w-code-shadow:         0 1px 3px rgba(0,0,0,0.04);
+  --w-filename-header-bg:  var(--w-border-soft);
+  --w-inline-code-color:   color-mix(in srgb, var(--w-accent) 85%, black);
+  --w-inline-code-bg:      var(--w-accent-soft);
+  --w-inline-code-border:  color-mix(in srgb, var(--w-accent) 18%, white);
+  --w-card-bg:             #ffffff;
+  --w-scrollbar-thumb:     #d1d5db;
 
   /* ── Header (navbar) ────────────────────────────────── */
   --header-bg:             #ffffff;
@@ -130,56 +135,64 @@ const FORGE_BASE_CSS = `/*
   --header-kbd-color:      #9ca3af;
 
   /* ── Left-hand nav (sidebar) ────────────────────────── */
-  --nav-bg:                var(--forge-sidebar-bg);
+  --nav-bg:                #f3f4f6;
   --nav-border:            #e5e7eb;
   --nav-section-color:     #9ca3af;
   --nav-item-color:        #4b5563;
   --nav-item-hover-bg:     #e9ebee;
   --nav-item-hover-color:  #111827;
   --nav-active-bg:         #ffffff;
-  --nav-active-color:      hsl(228 84% 61%);
-  --nav-active-bar:        hsl(228 84% 61%);
+  --nav-active-color:      var(--w-accent);
+  --nav-active-bar:        var(--w-accent);
   --nav-footer-bg:         #eceef1;
   --nav-footer-border:     #e5e7eb;
   --nav-footer-color:      #6b7280;
 }
 
 .dark {
-  --nextra-bg: 10 10 15;
-  --nextra-primary-lightness: 68%;
+  --nextra-bg: 17 17 17;
+  --nextra-primary-lightness: 61%;
 
-  --forge-accent-soft:   hsl(228 84% 11%);
-  --forge-accent-border: hsl(228 84% 40%);
-  --forge-bg:            rgb(10 10 15);
-  --forge-sidebar-bg:    rgb(14 14 20);
-  --forge-border:        #1f2937;
-  --forge-border-soft:   #111827;
-  --forge-text-strong:   #f9fafb;
-  --forge-text:          #d1d5db;
-  --forge-text-soft:     #9ca3af;
-  --forge-text-faint:    #6b7280;
-  --forge-hover-bg:      #111827;
+  --w-accent-soft:   color-mix(in srgb, var(--w-accent) 15%, #111111);
+  --w-accent-border: color-mix(in srgb, var(--w-accent) 45%, #111111);
+  --w-bg:            #111111;
+  --w-border:        #2d2d2d;
+  --w-border-soft:   #1a1a1a;
+  --w-text-strong:   #f9fafb;
+  --w-text:          #d1d5db;
+  --w-text-soft:     #9ca3af;
+  --w-text-faint:    #6b7280;
+  --w-hover-bg:      #1e1e1e;
 
-  --header-bg:             rgb(10 10 15);
-  --header-border:         #1f2937;
+  --w-code-bg:             #161616;
+  --w-code-shadow:         none;
+  --w-filename-header-bg:  #1a1a1a;
+  --w-inline-code-color:   color-mix(in srgb, var(--w-accent) 60%, white);
+  --w-inline-code-bg:      color-mix(in srgb, var(--w-accent) 12%, #111111);
+  --w-inline-code-border:  color-mix(in srgb, var(--w-accent) 22%, #111111);
+  --w-card-bg:             #161616;
+  --w-scrollbar-thumb:     #3d3d3d;
+
+  --header-bg:             #111111;
+  --header-border:         #2d2d2d;
   --header-logo-color:     #f9fafb;
-  --header-search-bg:      #111827;
-  --header-search-border:  #1f2937;
+  --header-search-bg:      #1e1e1e;
+  --header-search-border:  #2d2d2d;
   --header-search-color:   #9ca3af;
-  --header-kbd-bg:         #1f2937;
+  --header-kbd-bg:         #2d2d2d;
   --header-kbd-color:      #4b5563;
 
-  --nav-bg:                var(--forge-sidebar-bg);
-  --nav-border:            #1f2937;
+  --nav-bg:                #1a1a1a;
+  --nav-border:            #2d2d2d;
   --nav-section-color:     #6b7280;
   --nav-item-color:        #9ca3af;
-  --nav-item-hover-bg:     #111827;
+  --nav-item-hover-bg:     #222222;
   --nav-item-hover-color:  #f9fafb;
-  --nav-active-bg:         hsl(228 84% 11%);
-  --nav-active-color:      hsl(228 84% 68%);
-  --nav-active-bar:        hsl(228 84% 68%);
-  --nav-footer-bg:         rgb(10 10 15);
-  --nav-footer-border:     #1f2937;
+  --nav-active-bg:         #242424;
+  --nav-active-color:      color-mix(in srgb, var(--w-accent) 60%, white);
+  --nav-active-bar:        color-mix(in srgb, var(--w-accent) 60%, white);
+  --nav-footer-bg:         #111111;
+  --nav-footer-border:     #2d2d2d;
   --nav-footer-color:      #6b7280;
 }
 
@@ -188,82 +201,12 @@ const FORGE_BASE_CSS = `/*
    ═══════════════════════════════════════════════════════════════════════════ */
 
 html {
-  font-family: var(--forge-font-family, 'Inter', ui-sans-serif, system-ui, sans-serif) !important;
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  font-family: var(--w-font-family) !important;
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.011em;
 }
 
-body { background-color: var(--forge-bg); }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   NAVIGATION TABS — SidebarTabs component rendered in the sidebar DOM.
-   Uses Nextra's useConfig().topLevelNavbarItems for data + usePathname()
-   for active state. The navbar's built-in page-tabs are hidden via CSS.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* SidebarTabs container — fixed below the search box */
-.forge-sidebar-tabs {
-  position: fixed;
-  top: calc(var(--nextra-navbar-height) + 3.75rem);
-  left: 0;
-  width: 295px;
-  display: flex;
-  gap: 0.25rem;
-  padding: 0.375rem 0.75rem;
-  background: var(--forge-sidebar-bg);
-  border-bottom: 1px solid var(--forge-border);
-  z-index: 36;
-  overflow-x: auto;
-}
-
-/* Individual tab button */
-.forge-sidebar-tab {
-  flex: none;
-  padding: 0.375rem 0.625rem;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  line-height: 1.2;
-  border-radius: 0.375rem;
-  border: 1px solid var(--forge-border);
-  color: var(--forge-text-soft);
-  white-space: nowrap;
-  text-decoration: none;
-  cursor: pointer;
-  background: transparent;
-  transition: background 0.15s, color 0.15s;
-}
-.forge-sidebar-tab:hover {
-  background: var(--forge-border-soft);
-  color: var(--forge-text-strong);
-}
-
-/* Active tab */
-.forge-sidebar-tab.active,
-.forge-sidebar-tab[data-active] {
-  background: var(--forge-accent-soft);
-  color: var(--forge-accent);
-  font-weight: 600;
-  border-color: var(--forge-accent-border);
-}
-
-/* Push sidebar nav down when tabs are present */
-body:has(.forge-sidebar-tabs) .nextra-sidebar > div:first-child {
-  padding-top: calc(var(--nextra-navbar-height) + 6.25rem) !important;
-}
-
-/* Hide Nextra's navbar page-tabs (the SidebarTabs component handles it) */
-.nextra-scrollbar:has(> a[href]):not(.nextra-search-results) {
-  display: none !important;
-}
-
-@media (max-width: 767px) {
-  .forge-sidebar-tabs { display: none; }
-  /* On mobile, restore Nextra navbar page-tabs (hamburger menu) */
-  .nextra-scrollbar:has(> a[href]):not(.nextra-search-results) {
-    display: flex !important;
-  }
-}
+body { background-color: var(--w-bg); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SIDEBAR LOGO — pinned to very top of sidebar column
@@ -276,7 +219,9 @@ body:has(.forge-sidebar-tabs) .nextra-sidebar > div:first-child {
   width: 295px;
   height: var(--nextra-navbar-height);
   background: var(--nav-bg);
-  z-index: 36;
+  /* Above the navbar (z-100) so the pinned logo isn't painted over by
+     the navbar's opaque background. */
+  z-index: 110;
   display: flex;
   align-items: center;
   padding: 0 1rem;
@@ -293,19 +238,29 @@ body:has(.forge-sidebar-tabs) .nextra-sidebar > div:first-child {
   color: var(--nav-item-hover-color);
   text-decoration: none;
 }
+.forge-sidebar-logo a svg,
 .forge-sidebar-logo a img {
   flex-shrink: 0;
-  height: 24px;
-  width: auto;
+  color: var(--w-accent);
 }
+.forge-sidebar-logo a img { height: 24px; width: auto; }
 .forge-sidebar-logo a:hover { opacity: 0.75; }
 
-/* Light/dark logo swap — only fires when both variants are emitted. */
-img.forge-logo-dark { display: none !important; }
-.dark img.forge-logo-light { display: none !important; }
-.dark img.forge-logo-dark { display: inline-block !important; }
+/* Theme default mark + wordmark — used when a site doesn't configure
+   any logo of its own. Both pieces (the anvil SVG and the "Forge"
+   wordmark <b>) get the accent so the all-defaults presentation reads
+   clearly as the theme's brand colour. Selector specificity (0,2,0)
+   beats the broader '.forge-sidebar-logo a svg' / '.forge-navbar-logo
+   svg' colour rules (0,1,2) by class count, and the rule applies to the
+   <b> wordmark directly so it overrides the parent <a>/<span>
+   text-strong inheritance. */
+.forge-sidebar-logo .forge-logo-default,
+.forge-navbar-logo  .forge-logo-default {
+  color: var(--w-accent);
+}
 
-@media (max-width: 767px) {
+/* Sidebar logo hides with the sidebar at BP2. */
+@media (max-width: 899px) {
   .forge-sidebar-logo { display: none; }
 }
 
@@ -320,184 +275,85 @@ img.forge-logo-dark { display: none !important; }
   width: 295px;
   padding: 0.625rem 1rem;
   background: var(--nav-bg);
-  z-index: 36;
+  /* Above the navbar (z-100) for the same reason as .forge-sidebar-logo. */
+  z-index: 110;
 }
 
 .forge-sidebar-search .nextra-search input {
   width: 100% !important;
-  background: var(--forge-bg) !important;
-  border: 1px solid var(--forge-border) !important;
+  background: var(--w-bg) !important;
+  border: 1px solid var(--w-border) !important;
   border-radius: 0.5rem !important;
   padding: 0.4375rem 0.75rem !important;
   font-size: 0.8125rem !important;
   font-family: inherit !important;
-  color: var(--forge-text-soft) !important;
+  color: var(--w-text-soft) !important;
   transition: border-color 0.15s, box-shadow 0.15s !important;
 }
 .forge-sidebar-search .nextra-search input::placeholder {
-  color: var(--forge-text-faint) !important;
+  color: var(--w-text-faint) !important;
 }
 .forge-sidebar-search .nextra-search input:focus {
-  border-color: var(--forge-accent) !important;
-  box-shadow: 0 0 0 3px var(--forge-accent-soft) !important;
+  border-color: var(--w-accent) !important;
+  box-shadow: 0 0 0 3px var(--w-accent-soft) !important;
   outline: none !important;
-  color: var(--forge-text-strong) !important;
+  color: var(--w-text-strong) !important;
 }
 .forge-sidebar-search .nextra-search kbd {
-  background: var(--forge-border-soft) !important;
-  border: 1px solid var(--forge-border) !important;
+  background: var(--w-border-soft) !important;
+  border: 1px solid var(--w-border) !important;
   border-radius: 0.25rem !important;
-  color: var(--forge-text-faint) !important;
+  color: var(--w-text-faint) !important;
   font-family: inherit !important;
   font-size: 0.625rem !important;
   box-shadow: none !important;
   padding: 0 0.3rem !important;
 }
 .dark .forge-sidebar-search .nextra-search input {
-  background: var(--forge-border-soft) !important;
+  background: var(--w-border-soft) !important;
 }
 
-/* ── Sidebar anchors (persistent bottom links) ───────────────────────────── */
-.forge-sidebar-anchors {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 295px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
-  padding: 0.5rem 1rem 0.75rem;
-  background: var(--nav-bg);
-  border-top: 1px solid var(--forge-border);
-  z-index: 36;
-}
-.forge-anchor-link {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.25rem 0;
-  font-size: 0.8125rem;
-  color: var(--forge-text-soft);
-  text-decoration: none;
-  transition: color 0.15s;
-}
-.forge-anchor-link:hover {
-  color: var(--forge-accent);
-}
-.forge-anchor-icon {
-  flex-shrink: 0;
-}
-
+/* Push sidebar scroll area below the pinned logo + search */
 .nextra-sidebar > div:first-child {
   padding-top: calc(var(--nextra-navbar-height) + 3.75rem) !important;
+  scrollbar-gutter: auto !important;
 }
 
-/* Extra padding when page-tabs are present in the sidebar */
-body:has(.nextra-scrollbar:has(> a[href]):not(.nextra-search-results) > a) .nextra-sidebar > div:first-child {
-  padding-top: calc(var(--nextra-navbar-height) + 6.25rem) !important;
+/* Portaled dropdowns (search results, navbar Menu, ThemeSwitch Select).
+   Nextra renders these via HeadlessUI Menu/Listbox/Combobox with the
+   anchor prop, which portals the panel into a body-level
+   <div data-headlessui-portal>. The panel itself ships with x:z-30
+   (z-index: 30) which would otherwise sit BELOW the navbar (z=100) and
+   the pinned sidebar logo/search (z=110), causing the dropdowns to
+   clip behind the header. We elevate the portal wrapper to z=200 to
+   beat both. position: relative is required because z-index has no
+   effect on the default position: static — without it the rule
+   silently does nothing. Fixed-positioned descendants (the MenuItems
+   panel) are unaffected since we don't introduce a transform/filter on
+   the wrapper.
+   Current stacking order: portaled dropdowns (200) > sidebar logo/search
+   (110) > navbar (100) > drawer (60) > sidebar tree (10). */
+.nextra-search-results,
+[data-headlessui-portal],
+[data-floating-ui-portal] {
+  position: relative;
+  z-index: 200 !important;
 }
 
+/* In-component results (fallback for non-portal renders). */
 .nextra-search ul,
 .nextra-search [role="listbox"],
 .nextra-search [role="dialog"],
 .nextra-search > div:not(:first-child),
 .nextra-search > p {
-  z-index: 1000 !important;
+  z-index: 200 !important;
   position: relative;
 }
 
-body > [class*="rounded-xl"][class*="shadow-xl"],
-body > [class*="rounded-lg"][class*="shadow-lg"],
-body > [class*="z-30"][class*="rounded"],
-body > [class*="z-50"][class*="rounded"],
-body > div[id^="headlessui-combobox"],
-body > div[id^="headlessui"],
-body > [data-headlessui-state],
-body > div:has([role="listbox"]),
-body > div:has([role="dialog"]),
-body > [role="listbox"],
-body > [role="dialog"][aria-modal="true"]:has([role="listbox"]) {
-  position: relative !important;
-  z-index: 9999 !important;
-  min-width: 480px !important;
-  max-width: calc(100vw - 2rem) !important;
-}
-
-/* Same intent as the rules above, but matches the popover element directly.
-   Nextra v4 portals the search popover into
-   body > #headlessui-portal-root > div > .nextra-search-results, so the
-   "body > ..." direct-child selectors above never match in current Nextra. */
-.nextra-search-results {
-  z-index: 1000 !important;
-}
-
-body > [class*="rounded-xl"][class*="shadow-xl"] li > a,
-body > [class*="rounded-lg"][class*="shadow-lg"] li > a,
-body > [class*="rounded-xl"] [role="option"],
-body > [class*="rounded-lg"] [role="option"],
-body > [role="listbox"] [role="option"],
-body > div:has(> [role="listbox"]) [role="option"] {
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
-
-@media (max-width: 767px) {
+/* Sidebar search hides with the sidebar at BP2 — the navbar's own search
+   stays visible since it lives in a different DOM slot. */
+@media (max-width: 899px) {
   .forge-sidebar-search { display: none; }
-  .forge-sidebar-anchors { display: none; }
-  body > [class*="rounded-xl"][class*="shadow-xl"],
-  body > [class*="rounded-lg"][class*="shadow-lg"],
-  body > [class*="z-30"][class*="rounded"],
-  body > [class*="z-50"][class*="rounded"],
-  body > div[id^="headlessui-combobox"],
-  body > div:has(> [role="listbox"]),
-  body > [role="listbox"] {
-    min-width: 0 !important;
-    width: calc(100vw - 1rem) !important;
-    max-width: calc(100vw - 1rem) !important;
-    max-height: 70vh !important;
-  }
-  body > [class*="rounded-xl"][class*="shadow-xl"] li > a,
-  body > [class*="rounded-lg"][class*="shadow-lg"] li > a,
-  body > [class*="rounded-xl"] [role="option"],
-  body > [class*="rounded-lg"] [role="option"],
-  body > [role="listbox"] [role="option"],
-  body > div:has(> [role="listbox"]) [role="option"] {
-    white-space: normal !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-    padding: 0.75rem 0.875rem !important;
-    min-height: 2.75rem !important;
-  }
-  .nextra-search-results {
-    position: fixed !important;
-    top: calc(var(--nextra-navbar-height) + 6rem) !important;
-    left: 0.5rem !important;
-    right: 0.5rem !important;
-    bottom: 1rem !important;
-    width: auto !important;
-    max-width: none !important;
-    height: auto !important;
-    max-height: none !important;
-  }
-  .nextra-search-results [role="option"] {
-    padding: 0.75rem 0.875rem !important;
-    min-height: 2.75rem !important;
-  }
-}
-
-.nextra-skip-nav,
-a[href="#nextra-skip-nav"] {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-  clip-path: inset(50%) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -515,32 +371,107 @@ a[href="#nextra-skip-nav"] {
   max-width: 100% !important;
   padding-left: calc(295px + 1.5rem) !important;
   padding-right: 1.5rem !important;
-  gap: 0 !important;
+  gap: 1.25rem !important;
 }
 
+.nextra-navbar nav > a:not([href="/"]) {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  color: var(--w-text-soft) !important;
+  text-decoration: none !important;
+  transition: color 0.12s !important;
+}
+.nextra-navbar nav > a:not([href="/"]):hover {
+  color: var(--w-text-strong) !important;
+}
+
+/* When the sidebar collapses (BP2), drop the 295px left reservation so
+   the navbar content (incl. the navbar logo that now appears) starts
+   flush with the article column instead of sitting in the empty space
+   the sidebar used to occupy. */
+@media (max-width: 899px) {
+  .nextra-navbar nav {
+    padding-left: 1.5rem !important;
+  }
+}
 @media (max-width: 767px) {
   .nextra-navbar nav {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
-  .nextra-navbar nav > div:not(:has(.nextra-search)) {
-    display: none !important;
-  }
 }
 
-
-
+/* Desktop: hide the navbar logo (sidebar logo takes over) */
 .nextra-navbar nav > a[href="/"] {
   display: none !important;
 }
 
-@media (max-width: 767px) {
+/* Show the navbar logo whenever the sidebar (and its forge-sidebar-logo)
+   has collapsed — i.e. from BP2 down — so the bar always has a logo. */
+@media (max-width: 899px) {
   .nextra-navbar nav > a[href="/"] {
     display: flex !important;
     align-items: center !important;
     margin-right: auto !important;
   }
 }
+
+/* Hide page-map duplicates from the navbar pages strip on desktop —
+   .forge-nav-link items render via Navbar JSX children instead. */
+.nextra-navbar nav > div > a[target="_blank"]:not(.forge-nav-link) {
+  display: none !important;
+}
+
+/* Layering during the BP1–BP2 transition where the sidebar coexists with
+   the hamburger drawer. The drawer uses \`inset-0\` and paints its own
+   background across the whole viewport (its inner content is just padded
+   below the navbar) — without an explicit z-order, the drawer covers
+   *both* the sidebar AND the hamburger button itself, hiding the X-icon
+   transform. We pin:
+     navbar  (100) — stays on top so the hamburger button + close icon
+       remain visible and clickable while the drawer is open;
+     drawer  (60)  — above the sidebar so the open drawer is visible;
+     sidebar (10)  — below both. */
+header.nextra-navbar { z-index: 100 !important; }
+.nextra-mobile-nav   { z-index: 60 !important; }
+aside.nextra-sidebar { z-index: 10 !important; }
+
+/* Progressive navbar collapse. The hamburger drawer already mirrors every
+   nav surface, so as the viewport narrows we move items from the bar into
+   the drawer in three stages, each tied to roughly the width where the
+   relevant cluster starts to crowd the bar:
+     BP1 (≤1099px) — drop the inline header links (.forge-nav-link) and
+       the navbar theme switcher; surface the hamburger and allow the
+       mobile drawer to open at this width.
+     BP2 (≤899px)  — drop the internal Navbar JSX strip (Get Started, API
+       Reference, Community, …) as well; the hamburger remains the only
+       visible nav surface in the bar.
+     BP3 (≤767px)  — sidebar tree collapses too (handled in the LAYOUT
+       section), leaving content full-bleed with hamburger-only nav. */
+@media (max-width: 1099px) {
+  .nextra-navbar nav > .forge-nav-link            { display: none !important; }
+  .nextra-navbar nav > button[title="Change theme"] { display: none !important; }
+  .nextra-navbar .nextra-hamburger                { display: flex !important; }
+  .nextra-mobile-nav                              { display: flex !important; }
+}
+
+/* Pin inline header items to the theme font explicitly. */
+.nextra-navbar nav > a.forge-nav-link {
+  font-family: var(--w-font-family) !important;
+}
+
+/* External-link arrow on inline header items — matches the ↗ used on cards. */
+.forge-nav-link[href^="http"]::after {
+  content: '↗';
+  display: inline-block;
+  margin-left: 0.2em;
+  font-size: 0.85em;
+  font-family: var(--w-font-family);
+  color: var(--w-text-faint);
+  transition: color 0.12s;
+}
+.forge-nav-link[href^="http"]:hover::after { color: var(--w-text-strong); }
 
 .forge-navbar-logo {
   display: flex;
@@ -549,51 +480,35 @@ a[href="#nextra-skip-nav"] {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: var(--forge-text-strong);
+  color: var(--w-text-strong);
 }
+.forge-navbar-logo svg,
 .forge-navbar-logo img {
   flex-shrink: 0;
-  height: 24px;
-  width: auto;
+  color: var(--w-accent);
 }
+.forge-navbar-logo img { height: 24px; width: auto; }
 
+/* Internal nav-strip (Get Started / API Reference / Community …). Hidden
+   by default so Tailwind's x:flex utility can't reassert itself between
+   BP2 and BP1, then re-shown at BP2 (≥900px) with the desktop flex row
+   layout. The un-layered base rule beats the layered Tailwind utility
+   regardless of specificity. */
 .nextra-navbar nav > div:not(:has(.nextra-search)) {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  overflow: visible;
-  justify-content: flex-end;
+  display: none;
 }
-
-.nextra-navbar nav > div > a,
-.nextra-navbar nav > div > details {
-  padding: 0.375rem 0.625rem !important;
-  font-size: 0.8125rem !important;
-  font-weight: 500 !important;
-  color: var(--forge-text-soft) !important;
-  text-decoration: none !important;
-  border-radius: 0.375rem !important;
-  transition: background 0.12s, color 0.12s !important;
-  white-space: nowrap !important;
-}
-.nextra-navbar nav > div > a:hover,
-.nextra-navbar nav > div > details:hover {
-  background: var(--forge-hover-bg) !important;
-  color: var(--forge-text-strong) !important;
-}
-.nextra-navbar nav > div > details > summary {
-  cursor: pointer !important;
-  list-style: none !important;
+@media (min-width: 900px) {
+  .nextra-navbar nav > div:not(:has(.nextra-search)) {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    overflow: visible;
+  }
 }
 
 .nextra-navbar .nextra-search { margin-left: auto; }
 .forge-sidebar-search .nextra-search { margin-left: 0; width: 100%; }
-
-@media (min-width: 768px) {
-  .nextra-navbar .nextra-search { display: none !important; }
-}
-
 
 .nextra-search input {
   width: 13rem !important;
@@ -608,11 +523,11 @@ a[href="#nextra-skip-nav"] {
 }
 .nextra-search input::placeholder { color: var(--header-search-color) !important; }
 .nextra-search input:focus {
-  background: var(--forge-bg) !important;
-  border-color: var(--forge-accent) !important;
-  box-shadow: 0 0 0 3px var(--forge-accent-soft) !important;
+  background: var(--w-bg) !important;
+  border-color: var(--w-accent) !important;
+  box-shadow: 0 0 0 3px var(--w-accent-soft) !important;
   outline: none !important;
-  color: var(--forge-text-strong) !important;
+  color: var(--w-text-strong) !important;
 }
 
 .nextra-search kbd {
@@ -628,48 +543,89 @@ a[href="#nextra-skip-nav"] {
 }
 
 .nextra-hamburger {
-  color: var(--forge-text-soft) !important;
+  color: var(--w-text-soft) !important;
   padding: 0.375rem !important;
   border-radius: 0.375rem !important;
 }
 .nextra-hamburger:hover {
-  background: var(--forge-hover-bg) !important;
-  color: var(--forge-text-strong) !important;
+  background: var(--w-hover-bg) !important;
+  color: var(--w-text-strong) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MAIN LAYOUT — 5-col grid
-   col: [sidebar 295px] [1fr] [article 680px] [toc 220px] [1fr]
+   col: [sidebar 295px] [1fr] [article 920px] [toc 252px] [1fr]
    ═══════════════════════════════════════════════════════════════════════════ */
 
 div:has(> aside.nextra-sidebar) {
   display: grid !important;
-  grid-template-columns: 295px 1fr 680px 220px 1fr !important;
+  grid-template-columns: 295px 1fr 920px 252px 1fr !important;
   max-width: 100% !important;
   width: 100% !important;
   margin: 0 !important;
   align-items: start !important;
 }
 
-aside.nextra-sidebar { grid-column: 1 !important; grid-row: 1 !important; background: var(--forge-sidebar-bg) !important; border-right: 1px solid var(--forge-border); }
+aside.nextra-sidebar { grid-column: 1 !important; grid-row: 1 !important; }
 article              { grid-column: 3 !important; grid-row: 1 !important; min-width: 0 !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; }
-nav.nextra-toc       { grid-column: 4 !important; grid-row: 1 !important; width: 220px !important; order: unset !important; }
+nav.nextra-toc       { grid-column: 4 !important; grid-row: 1 !important; width: 252px !important; order: unset !important; }
 
+/* Footer outer wrapper — Nextra renders this as a full-width div outside the
+   main grid. Give it the same column template so its children land under the
+   article column, not the sidebar. */
+body > div:has(> footer) {
+  display: grid !important;
+  grid-template-columns: 295px 1fr 920px 252px 1fr !important;
+  background: var(--w-bg) !important;
+}
+
+body > div:has(> footer) > * {
+  grid-column: 3 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Tablet: TOC hidden, article becomes fluid (max 920px). */
 @media (max-width: 1279px) {
-  div:has(> aside.nextra-sidebar) { grid-template-columns: 295px 1fr 680px 1fr !important; }
-  article { grid-column: 3 !important; }
+  div:has(> aside.nextra-sidebar) {
+    grid-template-columns: 295px minmax(0, 1fr) !important;
+  }
+  body > div:has(> footer) {
+    grid-template-columns: 295px minmax(0, 1fr) !important;
+  }
+  article {
+    grid-column: 2 !important;
+    max-width: 920px !important;
+  }
+  body > div:has(> footer) > * { grid-column: 2 !important; }
   nav.nextra-toc { display: none !important; }
 }
 
+/* Small tablet: shrink article horizontal padding. */
 @media (max-width: 900px) {
-  div:has(> aside.nextra-sidebar) { grid-template-columns: 295px 1fr !important; }
-  article { grid-column: 2 !important; }
+  article { padding: 1rem 1.75rem 4.5rem !important; }
 }
 
+/* BP2 (≤899px): sidebar collapses behind the hamburger drawer; article
+   and footer cells move to a single grid column. The 920px article
+   max-width from the 1279 media query above still applies, so we center
+   the article with margin: 0 auto rather than left-pinning it. Between
+   BP1 (1100) and BP2 (900) the sidebar coexists with an open hamburger
+   drawer; the drawer z-index override below keeps it on top. */
+@media (max-width: 899px) {
+  div:has(> aside.nextra-sidebar)  { grid-template-columns: 1fr !important; }
+  body > div:has(> footer)          { grid-template-columns: 1fr !important; }
+  aside.nextra-sidebar             { display: none !important; }
+  article                          { grid-column: 1 !important; margin: 0 auto !important; }
+  body > div:has(> footer) > *      { grid-column: 1 !important; }
+}
+
+/* BP3 (≤767px): phone-only padding tighten — keeps content readable on
+   narrow viewports without the chunky tablet gutter. Top padding is
+   reduced from the desktop/tablet 1rem since the navbar is compact
+   and there's no breadcrumb spacing to absorb. */
 @media (max-width: 767px) {
-  div:has(> aside.nextra-sidebar) { grid-template-columns: 1fr !important; }
-  aside.nextra-sidebar { display: none !important; }
-  article { grid-column: 1 !important; padding: 0 1.25rem 4rem !important; }
+  article { padding: 0 1.25rem 4rem !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -697,54 +653,61 @@ div:has(> aside.nextra-sidebar)::before {
   pointer-events: none;
 }
 
-.nextra-sidebar > div:first-child {
-  padding: calc(var(--nextra-navbar-height) + 3.75rem) 1rem 1rem !important;
-}
-
 :is(.nextra-sidebar, .nextra-mobile-nav) > div > div > ul {
   gap: 0 !important;
   display: flex !important;
   flex-direction: column !important;
 }
 
-:is(.nextra-sidebar, .nextra-mobile-nav) > div > div > ul > li > button {
+:is(.nextra-sidebar, .nextra-mobile-nav) ul > li:not(:has(> a, > button)) {
   font-size: 0.6875rem !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
   color: var(--nav-section-color) !important;
-  background: none !important;
   padding: 0.375rem 0.5rem 0.25rem 0.875rem !important;
-  margin-top: 1.5rem !important;
-  gap: 0 !important;
-  cursor: default !important;
-  pointer-events: none !important;
-  border-radius: 0 !important;
+  margin-top: 1.05rem !important;
 }
-:is(.nextra-sidebar, .nextra-mobile-nav) > div > div > ul > li:first-of-type > button {
+:is(.nextra-sidebar, .nextra-mobile-nav) ul > li:first-of-type:not(:has(> a, > button)) {
   margin-top: 0.5rem !important;
 }
-:is(.nextra-sidebar, .nextra-mobile-nav) > div > div > ul > li > button > svg {
-  display: none !important;
-}
 
-:is(.nextra-sidebar, .nextra-mobile-nav) > div > div > ul > li.active > a,
-:is(.nextra-sidebar, .nextra-mobile-nav) > div > div > ul > li:not(.open) > a {
-  font-size: 0.8125rem !important;
+:is(.nextra-sidebar, .nextra-mobile-nav) ul > li > a,
+:is(.nextra-sidebar, .nextra-mobile-nav) ul > li > button {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--nav-item-color) !important;
   padding: 0.3125rem 0.5rem 0.3125rem 0.875rem !important;
   border-radius: 0.375rem !important;
+  background: none !important;
+  transition: background 0.1s, color 0.1s !important;
+  width: 100% !important;
+  text-align: start !important;
+}
+:is(.nextra-sidebar, .nextra-mobile-nav) ul > li > a:hover,
+:is(.nextra-sidebar, .nextra-mobile-nav) ul > li > button:hover {
+  background: var(--nav-item-hover-bg) !important;
+  color: var(--nav-item-hover-color) !important;
 }
 
 :is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul {
-  padding-left: 0.75rem !important;
-  margin-left: 0 !important;
+  padding-inline-start: 0 !important;
+  margin-inline-start: 0 !important;
   padding-top: 0 !important;
 }
-:is(.nextra-sidebar, .nextra-mobile-nav) > div > div > ul > li > div > ul {
-  padding-left: 0 !important;
-}
+/* Clip the Nextra <Collapse> wrapper during the open/close animation
+   so the inner items fold/unfold from the top instead of appearing
+   instantly at full text. Without this, Nextra's wrapper has
+   overflow:visible while opening (it only sets overflow:hidden via
+   the closed-state class), so the inner <ul> renders at full size
+   while the wrapper's height animates from 0 to natural — items
+   read as "appearing instantly" while the surrounding layout slides
+   down around them. After the animation completes Nextra calls
+   removeProperty('height') and the wrapper sits at height:auto, so
+   nothing is clipped in the steady state. */
 :is(.nextra-sidebar, .nextra-mobile-nav) li > div {
   padding-top: 0 !important;
+  overflow: hidden !important;
 }
 :is(.nextra-sidebar, .nextra-mobile-nav) li.open > a,
 :is(.nextra-sidebar, .nextra-mobile-nav) li.open > button {
@@ -755,12 +718,15 @@ div:has(> aside.nextra-sidebar)::before {
   width: 0 !important;
 }
 
-:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul li > a,
-:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul li > button {
-  font-size: 0.8125rem !important;
+/* Nested sidebar items — base styling for any nesting depth */
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > a,
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > button {
+  font-size: 0.875rem !important;
   font-weight: 500 !important;
   color: var(--nav-item-color) !important;
-  padding: 0.3125rem 0.5rem 0.3125rem 0.875rem !important;
+  padding-top: 0.3125rem !important;
+  padding-bottom: 0.3125rem !important;
+  padding-right: 0.5rem !important;
   border-radius: 0.375rem !important;
   background: none !important;
   transition: background 0.1s, color 0.1s !important;
@@ -768,25 +734,31 @@ div:has(> aside.nextra-sidebar)::before {
   position: relative !important;
   overflow: visible !important;
 }
-:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul li > a:hover,
-:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul li > button:hover {
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > a:hover,
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > button:hover {
   background: var(--nav-item-hover-bg) !important;
   color: var(--nav-item-hover-color) !important;
 }
 
-:is(.nextra-sidebar, .nextra-mobile-nav) li.active > a {
+/* Progressive indent per nesting depth.
+   Each Nextra nesting wrapper is li > div > ul; chain it once per depth. */
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > a,
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > button {
+  padding-left: calc(0.875rem + 0.625rem) !important;
+}
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > div > ul > li > a,
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > div > ul > li > button {
+  padding-left: calc(0.875rem + 1.25rem) !important;
+}
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > div > ul > li > div > ul > li > a,
+:is(.nextra-sidebar, .nextra-mobile-nav) li > div > ul > li > div > ul > li > div > ul > li > button {
+  padding-left: calc(0.875rem + 1.875rem) !important;
+}
+
+:is(.nextra-sidebar, .nextra-mobile-nav) li.active > a,
+:is(.nextra-sidebar, .nextra-mobile-nav) li.active > a:hover {
   color: var(--nav-active-color) !important;
   background: var(--nav-active-bg) !important;
-}
-:is(.nextra-sidebar, .nextra-mobile-nav) li.active > a::before {
-  content: '';
-  position: absolute;
-  left: -0.625rem;
-  top: 18%;
-  bottom: 18%;
-  width: 2px;
-  border-radius: 0 1px 1px 0;
-  background: var(--nav-active-bar);
 }
 
 .nextra-sidebar-footer { display: none !important; }
@@ -796,7 +768,7 @@ div:has(> aside.nextra-sidebar)::before {
 .nextra-navbar .nextra-theme-switch button {
   padding: 0.375rem !important;
   border-radius: 0.375rem !important;
-  color: var(--forge-text-soft) !important;
+  color: var(--w-text-soft) !important;
   background: none !important;
   border: none !important;
   cursor: pointer;
@@ -805,35 +777,121 @@ div:has(> aside.nextra-sidebar)::before {
   transition: background 0.1s, color 0.1s;
 }
 .nextra-navbar .nextra-theme-switch button:hover {
-  background: var(--forge-hover-bg) !important;
-  color: var(--forge-text-strong) !important;
+  background: var(--w-hover-bg) !important;
+  color: var(--w-text-strong) !important;
 }
 
 .nextra-mobile-nav {
   background: var(--nav-bg) !important;
-  overflow-y: auto !important;
-  -webkit-overflow-scrolling: touch;
-  scroll-padding-top: calc(var(--nextra-navbar-height, 54px) + 0.5rem);
 }
 .nextra-mobile-nav > div:first-child {
-  padding: calc(var(--nextra-navbar-height) + 0.75rem) 1rem 1rem !important;
-}
-.nextra-mobile-nav > div > div > ul > li:has(> a[href="/"]),
-.nextra-mobile-nav > div > div > ul > li:has(> a[href^="/api-"]):not(:has(> div > ul)),
-.nextra-mobile-nav > div > div > ul > li:has(> a[href^="http"]):not(:has(> div > ul)),
-.nextra-mobile-nav > div > div > ul > li:has(> a[href^="mailto:"]):not(:has(> div > ul)) {
-  font-weight: 500;
-}
-.nextra-mobile-nav > div > div > ul > li:has(> a[href="/"]) > a,
-.nextra-mobile-nav > div > div > ul > li:has(> a[href^="/api-"]):not(:has(> div > ul)) > a,
-.nextra-mobile-nav > div > div > ul > li:has(> a[href^="http"]):not(:has(> div > ul)) > a,
-.nextra-mobile-nav > div > div > ul > li:has(> a[href^="mailto:"]):not(:has(> div > ul)) > a {
-  font-size: 0.875rem !important;
-  color: var(--nav-item-hover-color) !important;
-  padding: 0.5rem 0.875rem !important;
+  padding: 0.75rem 1rem 1rem !important;
 }
 .nextra-mobile-nav .nextra-sidebar-footer {
-  display: none !important;
+  display: flex !important;
+  background: transparent !important;
+  border-top: none !important;
+}
+.nextra-mobile-nav .nextra-sidebar-footer button {
+  font-size: 0.75rem !important;
+  font-family: inherit !important;
+  font-weight: 500 !important;
+  color: var(--nav-footer-color) !important;
+  border-radius: 0.375rem !important;
+  padding: 0.3125rem 0.5rem !important;
+  transition: background 0.1s, color 0.1s !important;
+}
+.nextra-mobile-nav .nextra-sidebar-footer button:hover {
+  background: var(--nav-item-hover-bg) !important;
+  color: var(--nav-item-hover-color) !important;
+}
+
+/* Containerize each top-level page-section / menu in the mobile drawer
+   so they read as distinct cards instead of blending into a flat
+   stack of items. Targets direct \`<li>\` children of the drawer's
+   top-level \`<ul>\` that have a header \`<button>\` — that's how
+   Nextra renders both type:page Folders (data-href="/...") and
+   type:menu items (e.g. Community). External link items (Status,
+   Pricing, Dashboard) render as \`<li><a>\` and don't match, so
+   they stay flat above the containerized sections.
+   Nextra's existing collapse/expand behavior is untouched. */
+@media (max-width: 767px) {
+  /* Switch the drawer UL from Nextra's grid to flex+wrap so the
+     external-link items can flow inline (Status / Pricing /
+     Dashboard on one row) while the containerized sections still
+     take a full row each via flex-basis: 100%. Row + column gap
+     replaces the per-LI margins so spacing stays consistent. */
+  .nextra-mobile-nav > ul {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem 0 !important;
+    align-items: flex-start !important;
+  }
+
+  /* Inline external links inherit the sidebar item's left-indented
+     padding (0.875rem left, 0.5rem right) which makes them sit too
+     far apart in a horizontal row. Override to asymmetric padding —
+     a bit more on the left so the first item doesn't sit flush
+     against the drawer edge, but not so much that adjacent items
+     drift apart. */
+  .nextra-mobile-nav > ul > li:has(> a[target="_blank"]) > a {
+    padding: 0.3125rem 0.375rem 0.3125rem 0.75rem !important;
+  }
+
+  .nextra-mobile-nav > ul > li:has(> button) {
+    flex-basis: 100% !important;
+    background: var(--w-bg) !important;
+    border: 1px solid var(--w-border) !important;
+    border-radius: 0.5rem !important;
+    margin: 0 !important;
+  }
+
+  /* Section header (the collapsible button) — slightly bolder so the
+     container reads as a card with a header row. */
+  .nextra-mobile-nav > ul > li:has(> button) > button {
+    font-weight: 600 !important;
+    color: var(--w-text-strong) !important;
+    padding: 0.6875rem 0.875rem !important;
+    border-radius: 0.5rem 0.5rem 0 0 !important;
+  }
+  .nextra-mobile-nav > ul > li:has(> button):not(.open) > button {
+    border-radius: 0.5rem !important;
+  }
+  .nextra-mobile-nav > ul > li:has(> button) > button:hover {
+    background: var(--w-hover-bg) !important;
+  }
+
+  /* Inner item list when expanded — subtle divider + breathing room.
+     Scoped to .open so the closed-state Collapse wrapper (height: 0
+     under overflow: hidden) doesn't render a sliver of padding under
+     the header. Tailwind's box-sizing: border-box would otherwise
+     keep the padding visible even at height: 0. */
+  .nextra-mobile-nav > ul > li.open:has(> button) > div {
+    padding: 0.625rem 0.5rem 0.75rem !important;
+    border-top: 1px solid var(--w-border-soft) !important;
+  }
+
+  /* Shift per-level indents one step shallower for items INSIDE a
+     containerized top-level section. The container's header button
+     is itself an extra wrapper level vs. the desktop sidebar (which
+     just renders the page's docs subtree at the root of the
+     sidebar's UL), so the same item ends up one level deeper in
+     mobile and would pick up the deeper-nesting padding. Walking
+     it back by one level lines the items up with the desktop
+     sidebar's indentation and with the GUIDES separator (which
+     uses a flat 0.875rem from elsewhere). */
+  .nextra-mobile-nav > ul > li:has(> button) > div > ul > li > a,
+  .nextra-mobile-nav > ul > li:has(> button) > div > ul > li > button {
+    padding-left: 0.875rem !important;
+  }
+  .nextra-mobile-nav > ul > li:has(> button) > div > ul > li > div > ul > li > a,
+  .nextra-mobile-nav > ul > li:has(> button) > div > ul > li > div > ul > li > button {
+    padding-left: calc(0.875rem + 0.625rem) !important;
+  }
+  .nextra-mobile-nav > ul > li:has(> button) > div > ul > li > div > ul > li > div > ul > li > a,
+  .nextra-mobile-nav > ul > li:has(> button) > div > ul > li > div > ul > li > div > ul > li > button {
+    padding-left: calc(0.875rem + 1.25rem) !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -841,8 +899,10 @@ div:has(> aside.nextra-sidebar)::before {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .nextra-toc {
-  width: 220px !important;
+  width: 252px !important;
   min-width: 0 !important;
+  padding-top: 1rem !important;
+  padding-left: 2rem !important;
   position: sticky !important;
   top: var(--nextra-navbar-height) !important;
   max-height: calc(100vh - var(--nextra-navbar-height)) !important;
@@ -854,7 +914,7 @@ div:has(> aside.nextra-sidebar)::before {
   font-weight: 600 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.08em !important;
-  color: var(--forge-text-faint) !important;
+  color: var(--w-text-faint) !important;
   padding: 1.5rem 1rem 0.5rem !important;
 }
 
@@ -863,461 +923,19 @@ div:has(> aside.nextra-sidebar)::before {
 .nextra-toc ul li a {
   font-size: 0.8125rem !important;
   font-weight: 400 !important;
-  color: var(--forge-text-soft) !important;
+  color: var(--w-text-soft) !important;
   padding: 0.3rem 0 !important;
   display: block !important;
   transition: color 0.12s !important;
   line-height: 1.4 !important;
 }
-.nextra-toc ul li a:hover { color: var(--forge-accent) !important; }
+.nextra-toc ul li a:hover { color: var(--w-accent) !important; }
 .nextra-toc ul li a[class*="font-semibold"] {
-  color: var(--forge-accent) !important;
+  color: var(--w-accent) !important;
   font-weight: 500 !important;
 }
 
 .nextra-toc > div > div:last-child { display: none !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   ARTICLE CONTENT
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-article {
-  padding: 0 2.5rem 5rem !important;
-  color: var(--forge-text) !important;
-}
-
-.nextra-breadcrumb {
-  margin-top: 1.5rem !important;
-  margin-bottom: 0.375rem !important;
-  font-size: 0.75rem !important;
-  color: var(--forge-text-faint) !important;
-  gap: 0.375rem !important;
-}
-.nextra-breadcrumb span:last-child {
-  color: var(--forge-accent) !important;
-  font-weight: 500 !important;
-}
-
-article h1 {
-  font-size: 1.75rem !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.035em !important;
-  line-height: 1.2 !important;
-  color: var(--forge-text-strong) !important;
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.75rem !important;
-}
-article h1 + p {
-  font-size: 1rem !important;
-  color: var(--forge-text-soft) !important;
-  line-height: 1.65 !important;
-  margin-top: 0 !important;
-  margin-bottom: 1.5rem !important;
-}
-article h2 {
-  font-size: 1.1875rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.025em !important;
-  line-height: 1.3 !important;
-  color: var(--forge-text-strong) !important;
-  margin-top: 2.25rem !important;
-  margin-bottom: 0.625rem !important;
-  padding-bottom: 0 !important;
-  border-bottom: none !important;
-}
-article h3 {
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.015em !important;
-  color: var(--forge-text-strong) !important;
-  margin-top: 1.75rem !important;
-  margin-bottom: 0.5rem !important;
-}
-article h4 {
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  color: var(--forge-text-strong) !important;
-  margin-top: 1.25rem !important;
-}
-article p {
-  font-size: 0.9375rem !important;
-  line-height: 1.75 !important;
-  color: var(--forge-text) !important;
-}
-article a:not(.nextra-card) {
-  color: var(--forge-accent) !important;
-  font-weight: 500 !important;
-  text-decoration: none !important;
-}
-article a:not(.nextra-card):hover {
-  text-decoration: underline !important;
-  text-underline-offset: 2px !important;
-}
-article ul, article ol {
-  font-size: 0.9375rem !important;
-  line-height: 1.75 !important;
-  color: var(--forge-text) !important;
-}
-article hr { border-color: var(--forge-border) !important; margin: 2rem 0 !important; }
-article strong { color: var(--forge-text-strong) !important; font-weight: 600 !important; }
-
-article *:has(> table) {
-  max-width: 100% !important;
-}
-article table {
-  display: table !important;
-  width: auto !important;
-  max-width: 100% !important;
-  font-size: 0.875rem !important;
-  border-collapse: separate !important;
-  border-spacing: 0 !important;
-  border: 1px solid var(--forge-border) !important;
-  border-radius: 0.5rem !important;
-  margin: 1.5rem 0 !important;
-  table-layout: auto !important;
-  word-break: break-word;
-}
-article thead tr th {
-  background: var(--forge-border-soft) !important;
-  color: var(--forge-text-soft) !important;
-  font-size: 0.6875rem !important;
-  font-weight: 600 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  padding: 0.625rem 0.875rem !important;
-  border-bottom: 1px solid var(--forge-border) !important;
-  text-align: left !important;
-}
-.dark article thead tr th { background: #111827 !important; }
-article tbody tr td {
-  padding: 0.625rem 0.875rem !important;
-  color: var(--forge-text) !important;
-  border-bottom: 1px solid var(--forge-border) !important;
-  vertical-align: top !important;
-  font-size: 0.875rem !important;
-  line-height: 1.5 !important;
-}
-article tbody tr:last-child td { border-bottom: none !important; }
-article tbody tr:hover td { background: var(--forge-hover-bg) !important; }
-
-article code:not(pre code) {
-  font-size: 0.8125em !important;
-  font-weight: 500 !important;
-  color: hsl(228 84% 52%) !important;
-  background: var(--forge-accent-soft) !important;
-  border: 1px solid hsl(228 84% 88%) !important;
-  border-radius: 0.3rem !important;
-  padding: 0.1em 0.4em !important;
-}
-.dark article code:not(pre code) {
-  color: hsl(228 84% 72%) !important;
-  background: hsl(228 84% 10%) !important;
-  border-color: hsl(228 84% 20%) !important;
-}
-
-.nextra-code pre, article pre {
-  font-size: 0.8125rem !important;
-  line-height: 1.7 !important;
-  border-radius: 0.625rem !important;
-  border: 1.5px solid var(--forge-border) !important;
-  padding: 1rem 1.25rem !important;
-  background: #f8fafc !important;
-  overflow-x: auto;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04) !important;
-}
-.dark .nextra-code pre, .dark article pre {
-  background: #0d1117 !important;
-  border-color: var(--forge-border) !important;
-  box-shadow: none !important;
-}
-
-.nextra-code {
-  position: relative !important;
-}
-.nextra-code button[title="Copy code"] {
-  top: 0.5rem !important;
-  right: 0.5rem !important;
-  padding: 0.3125rem 0.4375rem !important;
-  background: #ffffff !important;
-  border: 1px solid var(--forge-border) !important;
-  border-radius: 0.375rem !important;
-  color: var(--forge-text-soft) !important;
-  opacity: 0.85 !important;
-  transition: opacity 0.12s, color 0.12s, border-color 0.12s, background 0.12s !important;
-}
-.nextra-code:hover button[title="Copy code"] {
-  opacity: 1 !important;
-}
-.nextra-code button[title="Copy code"]:hover {
-  color: var(--forge-accent) !important;
-  border-color: var(--forge-accent) !important;
-}
-.dark .nextra-code button[title="Copy code"] {
-  background: #161b22 !important;
-}
-
-article kbd {
-  display: inline-block;
-  font-family: var(--font-mono, ui-monospace, 'SF Mono', Menlo, Consolas, monospace) !important;
-  font-size: 0.75rem !important;
-  font-weight: 500 !important;
-  line-height: 1 !important;
-  color: var(--forge-text-strong) !important;
-  background: #ffffff !important;
-  border: 1px solid var(--forge-border) !important;
-  border-radius: 0.3125rem !important;
-  padding: 0.1875rem 0.4375rem !important;
-  box-shadow: inset 0 -1.5px 0 var(--forge-border-soft), 0 1px 0 var(--forge-border-soft) !important;
-  vertical-align: 1px;
-}
-.dark article kbd {
-  color: var(--forge-text-strong) !important;
-  background: var(--forge-border-soft) !important;
-  border-color: var(--forge-border) !important;
-  box-shadow: inset 0 -1.5px 0 #000, 0 1px 0 #000 !important;
-}
-
-article dl {
-  display: grid !important;
-  grid-template-columns: 9rem 1fr !important;
-  column-gap: 1.5rem !important;
-  row-gap: 0.75rem !important;
-  margin: 1.5rem 0 !important;
-  padding: 1rem 1.25rem !important;
-  border: 1px solid var(--forge-border) !important;
-  border-radius: 0.5rem !important;
-  background: var(--forge-bg) !important;
-}
-article dt {
-  font-family: var(--font-mono, ui-monospace, 'SF Mono', Menlo, Consolas, monospace) !important;
-  font-size: 0.8125rem !important;
-  font-weight: 500 !important;
-  color: var(--forge-accent) !important;
-  align-self: start !important;
-  padding-top: 0.1875rem !important;
-}
-article dd {
-  margin: 0 !important;
-  font-size: 0.875rem !important;
-  line-height: 1.6 !important;
-  color: var(--forge-text) !important;
-}
-@media (max-width: 767px) {
-  article dl {
-    grid-template-columns: 1fr !important;
-    row-gap: 0.25rem !important;
-  }
-  article dd {
-    margin-bottom: 0.5rem !important;
-  }
-}
-
-.nextra-callout {
-  border-radius: 0.5rem !important;
-  padding: 0.875rem 1.125rem !important;
-  font-size: 0.875rem !important;
-  line-height: 1.6 !important;
-  margin: 1.25rem 0 !important;
-  border-width: 1px !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   CARDS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.nextra-cards { gap: 0.75rem !important; margin-top: 1.25rem !important; }
-
-a.nextra-card {
-  border: 1px solid var(--forge-border) !important;
-  border-radius: 0.625rem !important;
-  background: white !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  transition: border-color 0.15s, box-shadow 0.15s !important;
-  display: flex !important;
-  flex-direction: column !important;
-  text-decoration: none !important;
-  position: relative;
-}
-.dark a.nextra-card { background: #0d1117 !important; border-color: var(--forge-border) !important; }
-
-a.nextra-card:hover {
-  border-color: var(--forge-accent-border) !important;
-  box-shadow: 0 0 0 3px var(--forge-accent-soft) !important;
-  background: white !important;
-}
-.dark a.nextra-card:hover { background: #0d1117 !important; }
-
-a.nextra-card > span {
-  padding: 1rem 1.125rem 0.875rem !important;
-  gap: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  padding-right: 2.25rem !important;
-}
-a.nextra-card > span > span {
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
-  color: var(--forge-text-strong) !important;
-  letter-spacing: -0.01em !important;
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
-}
-a.nextra-card::after {
-  content: '\\2197';
-  position: absolute;
-  top: 0.9rem;
-  right: 1rem;
-  font-size: 0.875rem;
-  line-height: 1;
-  color: var(--forge-text-faint);
-  transition: color 0.15s;
-  font-weight: 400;
-}
-a.nextra-card:hover::after { color: var(--forge-accent) !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   PREV/NEXT + FOOTER
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-article + div { border-top-color: var(--forge-border) !important; }
-article + div a { font-size: 0.875rem !important; color: var(--forge-text-soft) !important; font-weight: 500 !important; }
-article + div a:hover { color: var(--forge-accent) !important; }
-article > div[class*="text-end"] { font-size: 0.75rem !important; color: var(--forge-text-faint) !important; }
-
-body > div:last-of-type { background: var(--forge-bg) !important; }
-
-footer {
-  font-size: 0.8125rem !important;
-  color: var(--forge-text-faint) !important;
-  padding: 2.5rem 0 3rem !important;
-  width: 900px !important;
-  max-width: calc(100vw - 295px - 2rem) !important;
-  margin-left: calc(295px + max((100vw - 295px - 900px) / 2, 0px)) !important;
-  margin-right: auto !important;
-  border-top: 1px solid var(--forge-border-soft) !important;
-}
-
-@media (max-width: 767px) {
-  footer {
-    width: auto !important;
-    margin-left: 0 !important;
-    max-width: 100vw !important;
-    padding: 2rem 1.25rem !important;
-  }
-}
-
-.nextra-border { border-color: var(--forge-border) !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   MISC
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.subheading-anchor { opacity: 0; margin-left: 0.375rem; font-size: 0.75em; transition: opacity 0.15s; }
-*:hover > .subheading-anchor, .subheading-anchor:focus { opacity: 0.4; }
-
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
-.dark ::-webkit-scrollbar-thumb { background: #374151; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FOOTER (structured) — rendered when SiteBranding.footer is configured
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.forge-footer {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.75rem;
-  padding: 0 0.5rem;
-}
-
-.forge-footer-columns {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 1.5rem;
-}
-
-.forge-footer-col h4 {
-  font-size: 0.6875rem !important;
-  font-weight: 600 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.08em !important;
-  color: var(--forge-text-soft) !important;
-  margin: 0 0 0.5rem 0 !important;
-}
-
-.forge-footer-col ul {
-  list-style: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.25rem !important;
-}
-
-.forge-footer-col a {
-  font-size: 0.8125rem !important;
-  color: var(--forge-text-soft) !important;
-  text-decoration: none !important;
-}
-.forge-footer-col a:hover {
-  color: var(--forge-accent) !important;
-}
-
-.forge-footer-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--forge-border-soft);
-  font-size: 0.75rem;
-  color: var(--forge-text-faint);
-}
-
-.forge-footer-copyright,
-.forge-footer-powered {
-  font-size: 0.75rem;
-  color: var(--forge-text-faint);
-}
-
-.forge-footer-social {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.875rem;
-}
-.forge-footer-social a {
-  font-size: 0.75rem;
-  color: var(--forge-text-soft) !important;
-  text-decoration: none !important;
-}
-.forge-footer-social a:hover {
-  color: var(--forge-accent) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   CTA BUTTON — primary call-to-action rendered in the navbar
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.forge-cta-button {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.375rem 0.875rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 0.375rem;
-  background: var(--forge-accent);
-  color: white;
-  text-decoration: none;
-  transition: opacity 0.15s;
-}
-.forge-cta-button:hover { opacity: 0.85; }
-
 `;
 
 // ── Override generator ──────────────────────────────────────────────────────
@@ -1326,21 +944,11 @@ function buildForgeOverrides(input) {
 	const hue = input.accentHue;
 	const sat = input.accentSaturation ?? 84;
 	const lit = input.accentLightness ?? 61;
-	const accent = `hsl(${hue} ${sat}% ${lit}%)`;
-	const accentSoft = `hsl(${hue} ${sat}% 96%)`;
-	const accentBorder = `hsl(${hue} ${sat}% 75%)`;
+	const accentDarkL = Math.min(lit + 7, 100);
 
-	const dv = input.darkVariant;
-	const darkH = dv?.h ?? hue;
-	const darkS = dv?.s ?? sat;
-	const darkL = dv?.l ?? Math.min(lit + 7, 100);
-	const accentDark = `hsl(${darkH} ${darkS}% ${darkL}%)`;
-	const accentDarkSoft = `hsl(${darkH} ${darkS}% 11%)`;
-	const accentDarkBorder = `hsl(${darkH} ${darkS}% 40%)`;
-
-	const fontDecl = input.fontFamily ? `  --forge-font-family: ${input.fontFamily};\n` : "";
-	const bgLightDecl = input.backgroundLight ? `  --forge-bg: ${input.backgroundLight};\n` : "";
-	const bgDarkDecl = input.backgroundDark ? `  --forge-bg: ${input.backgroundDark};\n` : "";
+	const fontDecl = input.fontFamily ? `  --w-font-family: ${input.fontFamily};\n` : "";
+	const bgLightDecl = input.backgroundLight ? `  --w-bg: ${input.backgroundLight};\n` : "";
+	const bgDarkDecl = input.backgroundDark ? `  --w-bg: ${input.backgroundDark};\n` : "";
 
 	return `
 /* ── Forge theme overrides (generated) ──────────────────────────────────── */
@@ -1348,22 +956,10 @@ function buildForgeOverrides(input) {
 ${fontDecl}${bgLightDecl}  --nextra-primary-hue:        ${hue};
   --nextra-primary-saturation: ${sat}%;
   --nextra-primary-lightness:  ${lit}%;
-
-  --forge-accent:        ${accent};
-  --forge-accent-soft:   ${accentSoft};
-  --forge-accent-border: ${accentBorder};
-
-  --nav-active-color: ${accent};
-  --nav-active-bar:   ${accent};
 }
 
 .dark {
-${bgDarkDecl}  --nextra-primary-lightness: ${darkL}%;
-
-  --forge-accent-soft:       ${accentDarkSoft};
-  --forge-accent-border:     ${accentDarkBorder};
-  --nav-active-color:        ${accentDark};
-  --nav-active-bar:          ${accentDark};
+${bgDarkDecl}  --nextra-primary-lightness: ${accentDarkL}%;
 }
 `;
 }
@@ -1371,18 +967,27 @@ ${bgDarkDecl}  --nextra-primary-lightness: ${darkL}%;
 // ── Public API ──────────────────────────────────────────────────────────────
 
 export function buildCss(config) {
-	const accent = resolveAccent(config?.theme, 228, 84, 61);
-	const fontFamily = config?.theme?.fontFamily ?? manifest.defaults.fontFamily;
-	const fontCss = FONT_CONFIG[fontFamily]?.cssFamily;
+	const accent = resolveAccent(
+		config?.theme,
+		manifest.defaults.primaryHue,
+		manifest.defaults.accentSaturation,
+		manifest.defaults.accentLightness,
+	);
+	const requestedFont = typeof config?.theme?.fontFamily === "string" ? config.theme.fontFamily.trim() : "";
+	const fontFamily = requestedFont || manifest.defaults.fontFamily;
+	const fontCss = FONT_CONFIG[fontFamily] ?? FONT_CONFIG[manifest.defaults.fontFamily];
 
-	return FORGE_BASE_CSS + buildForgeOverrides({
-		accentHue: accent.hue,
-		accentSaturation: accent.saturation,
-		accentLightness: accent.lightness,
-		lightVariant: accent.light,
-		darkVariant: accent.dark,
-		fontFamily: fontCss,
-		backgroundLight: config?.theme?.background?.light,
-		backgroundDark: config?.theme?.background?.dark,
-	});
+	return (
+		COMPONENTS_CSS +
+		"\n" +
+		FORGE_THEME_CSS +
+		buildForgeOverrides({
+			accentHue: accent.hue,
+			accentSaturation: accent.saturation,
+			accentLightness: accent.lightness,
+			fontFamily: fontCss,
+			backgroundLight: config?.theme?.background?.light,
+			backgroundDark: config?.theme?.background?.dark,
+		})
+	);
 }

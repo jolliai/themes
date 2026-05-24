@@ -5,7 +5,7 @@
 
 const manifest = {
 	name: "flux",
-	version: "1.0.0",
+	version: "2.0.0",
 	displayName: "Flux",
 	tagline: "Production-grade documentation with fixed sidebar",
 	defaults: {

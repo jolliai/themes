@@ -4,7 +4,7 @@
 
 const manifest = {
 	name: "atlas",
-	version: "1.0.0",
+	version: "2.0.0",
 	displayName: "Atlas",
 	tagline: "Editorial handbook",
 	defaults: {

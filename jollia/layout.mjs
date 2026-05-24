@@ -14,7 +14,7 @@ export function generateLayout(config) {
 	if (config.header?.primary) {
 		const href = JSON.stringify(config.header.primary.href);
 		const label = JSON.stringify(config.header.primary.label);
-		primaryButton = `<a href={${href}} style={{ background: 'var(--jolli-green)', color: 'white', padding: '0.375rem 0.875rem', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>{${label}}</a>`;
+		primaryButton = `<a href={${href}} style={{ background: 'var(--w-accent)', color: 'white', padding: '0.375rem 0.875rem', borderRadius: '0.375rem', fontSize: '0.875rem', fontWeight: 500, textDecoration: 'none' }}>{${label}}</a>`;
 	}
 
 	return `import { Footer, Navbar } from 'nextra-theme-docs'
@@ -31,7 +31,7 @@ export const metadata = {
   description: ${description},
 }
 
-const navbar = <Navbar logo={<b style={{ color: 'var(--jolli-green)', fontSize: '1.125rem' }}>{${title}}</b>}>${primaryButton}</Navbar>
+const navbar = <Navbar logo={<b style={{ color: 'var(--w-accent)', fontSize: '1.125rem' }}>{${title}}</b>}>${primaryButton}</Navbar>
 const footer = <Footer>MIT {new Date().getFullYear()} © Jolli.</Footer>
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

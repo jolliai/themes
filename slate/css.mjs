@@ -1,45 +1,89 @@
 /**
- * Slate theme CSS — collapsible sidebar, second-row tabs, rich footer.
+ * Slate theme CSS.
+ *
+ * Emits the shared component styles from ./components.mjs followed by
+ * Slate-specific design tokens and theme-prefixed layout selectors.
  */
 
-const CSS = `
+import COMPONENTS_CSS from "./components.mjs";
+
+const CSS = `/*
+ * Slate Theme — design tokens and layout selectors.
+ * Shared component styles live in ./components.mjs (prepended above).
+ */
+
 /* ═══════════════════════════════════════════════════════════
-   Slate Theme — Collapsible sidebar with rich footer
+   DESIGN TOKENS
    ═══════════════════════════════════════════════════════════ */
 
 :root {
-  --slate-green: #329100;
-  --slate-green-light: #43C200;
-  --slate-green-soft: #f0fdf4;
-  --slate-green-border: #86efac;
-  --slate-bg: #ffffff;
-  --slate-bg-surface: #f9fafb;
-  --slate-text: #1f2937;
-  --slate-text-soft: #6b7280;
-  --slate-text-faint: #9ca3af;
-  --slate-border: #e5e7eb;
-
+  /* Nextra internals */
   --nextra-primary-hue: 110;
   --nextra-primary-saturation: 100%;
   --nextra-primary-lightness: 28%;
-}
-.dark {
-  --slate-green: #43C200;
-  --slate-green-light: #86efac;
-  --slate-green-soft: #052e16;
-  --slate-green-border: #14532d;
-  --slate-bg: #111827;
-  --slate-bg-surface: #1f2937;
-  --slate-text: #f3f4f6;
-  --slate-text-soft: #9ca3af;
-  --slate-text-faint: #6b7280;
-  --slate-border: #374151;
+  --nextra-bg: 255 255 255;
+  --nextra-navbar-height: 100px;
 
-  --nextra-primary-lightness: 50%;
+  /* ── Accent ─────────────────────────────────────────── */
+  --w-accent:        #329100;
+  --w-accent-soft:   #f0fdf4;
+  --w-accent-border: #86efac;
+
+  /* ── General palette ────────────────────────────────── */
+  --w-bg:            #ffffff;
+  --w-border:        #e5e7eb;
+  --w-border-soft:   #f3f4f6;
+  --w-text-strong:   #1f2937;
+  --w-text:          #374151;
+  --w-text-soft:     #6b7280;
+  --w-text-faint:    #9ca3af;
+  --w-hover-bg:      #f9fafb;
+
+  /* ── Component colour tokens ────────────────────────── */
+  --w-code-bg:             #f8fafc;
+  --w-code-shadow:         0 1px 3px rgba(0,0,0,0.04);
+  --w-filename-header-bg:  var(--w-border-soft);
+  --w-inline-code-color:   color-mix(in srgb, var(--w-accent) 85%, black);
+  --w-inline-code-bg:      var(--w-accent-soft);
+  --w-inline-code-border:  color-mix(in srgb, var(--w-accent) 18%, white);
+  --w-card-bg:             #f9fafb;
+  --w-scrollbar-thumb:     #d1d5db;
+  --w-font-family:         'Inter', system-ui, -apple-system, sans-serif;
 }
+
+.dark {
+  --nextra-bg: 17 24 39;
+  --nextra-primary-lightness: 50%;
+
+  --w-accent:        #43C200;
+  --w-accent-soft:   #052e16;
+  --w-accent-border: #14532d;
+
+  --w-bg:            #111827;
+  --w-border:        #374151;
+  --w-border-soft:   #1f2937;
+  --w-text-strong:   #f9fafb;
+  --w-text:          #d1d5db;
+  --w-text-soft:     #9ca3af;
+  --w-text-faint:    #6b7280;
+  --w-hover-bg:      #1e2433;
+
+  --w-code-bg:       #1a2332;
+  --w-code-shadow:   none;
+  --w-filename-header-bg:  #1f2937;
+  --w-inline-code-color:   color-mix(in srgb, var(--w-accent) 60%, white);
+  --w-inline-code-bg:      color-mix(in srgb, var(--w-accent) 12%, #111827);
+  --w-inline-code-border:  color-mix(in srgb, var(--w-accent) 22%, #111827);
+  --w-card-bg:       #1f2937;
+  --w-scrollbar-thumb: #4b5563;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BASE
+   ═══════════════════════════════════════════════════════════ */
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-family: var(--w-font-family) !important;
 }
 
 /* ── Navbar ───────────────────────────────────────────────── */
@@ -64,6 +108,11 @@ body {
   border-radius: 0.5rem !important;
 }
 
+.nextra-navbar {
+  height: auto !important;
+  min-height: 100px;
+}
+
 /* ── Tabs — second row ───────────────────────────────────── */
 .nextra-scrollbar:has(> a[href]) {
   order: 100 !important;
@@ -74,14 +123,6 @@ body {
   background: transparent !important;
 }
 
-:root {
-  --nextra-navbar-height: 100px;
-}
-.nextra-navbar {
-  height: auto !important;
-  min-height: 100px;
-}
-
 /* Tab links */
 .nextra-scrollbar:has(> a[href]) > a {
   all: unset !important;
@@ -90,7 +131,7 @@ body {
   padding: 0.5rem 0.875rem !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
-  color: var(--slate-text-soft) !important;
+  color: var(--w-text-soft) !important;
   border-bottom: 2px solid transparent !important;
   cursor: pointer !important;
   transition: color 0.2s, border-color 0.2s !important;
@@ -99,23 +140,23 @@ body {
   padding-left: 0 !important;
 }
 .nextra-scrollbar:has(> a[href]) > a:hover {
-  color: var(--slate-text) !important;
+  color: var(--w-text-strong) !important;
 }
 .nextra-scrollbar:has(> a[href]) > a[aria-current] {
-  color: var(--slate-green) !important;
-  border-bottom-color: var(--slate-green) !important;
+  color: var(--w-accent) !important;
+  border-bottom-color: var(--w-accent) !important;
   font-weight: 600 !important;
 }
 
 /* ── Sidebar ─────────────────────────────────────────────── */
 aside.nextra-sidebar {
-  border-right: 1px solid var(--slate-border) !important;
+  border-right: 1px solid var(--w-border) !important;
 }
 aside.nextra-sidebar a:hover {
-  color: var(--slate-green) !important;
+  color: var(--w-accent) !important;
 }
 aside.nextra-sidebar li.active > a {
-  color: var(--slate-green) !important;
+  color: var(--w-accent) !important;
   font-weight: 600 !important;
 }
 
@@ -125,21 +166,15 @@ aside.nextra-sidebar li.active > a {
   font-size: 0.8125rem !important;
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
-  color: var(--slate-text) !important;
+  color: var(--w-text-strong) !important;
 }
 
 /* ── Links ────────────────────────────────────────────────── */
-a:hover { color: var(--slate-green); }
-
-/* ── Code blocks ─────────────────────────────────────────── */
-pre {
-  border: 1px solid var(--slate-border) !important;
-  border-radius: 0.5rem !important;
-}
+a:hover { color: var(--w-accent); }
 
 /* ── Footer — rich multi-column layout ───────────────────── */
 .slate-footer {
-  border-top: 1px solid var(--slate-border);
+  border-top: 1px solid var(--w-border);
   padding: 3rem 0 2rem;
 }
 .slate-footer-grid {
@@ -156,7 +191,7 @@ pre {
 .slate-footer-col-title {
   font-weight: 600;
   font-size: 0.8125rem;
-  color: var(--slate-text);
+  color: var(--w-text-strong);
   margin-bottom: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -171,12 +206,12 @@ pre {
 }
 .slate-footer-col a {
   font-size: 0.8125rem;
-  color: var(--slate-text-soft);
+  color: var(--w-text-soft);
   text-decoration: none;
   transition: color 0.15s;
 }
 .slate-footer-col a:hover {
-  color: var(--slate-green);
+  color: var(--w-accent);
 }
 .slate-footer-bottom {
   display: flex;
@@ -185,28 +220,28 @@ pre {
   max-width: 1200px;
   margin: 2rem auto 0;
   padding: 1.5rem 1.5rem 0;
-  border-top: 1px solid var(--slate-border);
+  border-top: 1px solid var(--w-border);
 }
 .slate-footer-copyright {
   font-size: 0.75rem;
-  color: var(--slate-text-faint);
+  color: var(--w-text-faint);
 }
 .slate-footer-social {
   display: flex;
   gap: 0.75rem;
 }
 .slate-footer-social a {
-  color: var(--slate-text-faint);
+  color: var(--w-text-faint);
   text-decoration: none;
   font-size: 0.75rem;
   transition: color 0.15s;
 }
 .slate-footer-social a:hover {
-  color: var(--slate-green);
+  color: var(--w-accent);
 }
 .slate-footer-powered {
   font-size: 0.6875rem;
-  color: var(--slate-text-faint);
+  color: var(--w-text-faint);
 }
 
 /* Hidden SidebarTabs — for root URL redirect */
@@ -239,6 +274,6 @@ pre {
 }
 `;
 
-export function buildCss() {
-	return CSS;
+export function buildCss(config) {
+	return COMPONENTS_CSS + "\n" + CSS;
 }

@@ -1,1984 +1,17 @@
 /**
  * Flux theme CSS — production-grade fixed-sidebar layout.
- * Based on Feldera docs build (Forge variant + components).
+ *
+ * Emits the shared component styles from ./components.mjs followed by
+ * Flux-specific design tokens and theme-prefixed layout selectors.
  */
 
-const CSS = `
-/*
- * Shared component styles — used by all themes.
- * All colours are driven by --w-* CSS custom properties defined in each
- * theme's style.css.  Never put hard-coded colour values in this file.
- */
+import manifest from "./manifest.mjs";
+import COMPONENTS_CSS from "./components.mjs";
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   ARTICLE CONTENT
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-article {
-  padding: 0 2.5rem 5rem !important;
-  color: var(--w-text) !important;
-}
-
-.nextra-breadcrumb {
-  margin-top: 1.5rem !important;
-  margin-bottom: 0.375rem !important;
-  font-size: 0.75rem !important;
-  color: var(--w-text-faint) !important;
-  gap: 0.375rem !important;
-}
-.nextra-breadcrumb span:last-child {
-  color: var(--w-accent) !important;
-  font-weight: 500 !important;
-}
-
-article h1 {
-  font-size: 1.75rem !important;
-  font-weight: 700 !important;
-  letter-spacing: -0.035em !important;
-  line-height: 1.2 !important;
-  color: var(--w-text-strong) !important;
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.75rem !important;
-}
-article h1 + p {
-  font-size: 1rem !important;
-  color: var(--w-text-soft) !important;
-  line-height: 1.65 !important;
-  margin-top: 0 !important;
-  margin-bottom: 1.5rem !important;
-}
-article h2 {
-  font-size: 1.1875rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.025em !important;
-  line-height: 1.3 !important;
-  color: var(--w-text-strong) !important;
-  margin-top: 2.25rem !important;
-  margin-bottom: 0.625rem !important;
-  padding-bottom: 0 !important;
-  border-bottom: none !important;
-}
-article h3 {
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  letter-spacing: -0.015em !important;
-  color: var(--w-text-strong) !important;
-  margin-top: 1.75rem !important;
-  margin-bottom: 0.5rem !important;
-}
-article h4 {
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  color: var(--w-text-strong) !important;
-  margin-top: 1.25rem !important;
-}
-article p {
-  font-size: 0.9375rem !important;
-  line-height: 1.75 !important;
-  color: var(--w-text) !important;
-}
-article a:not(.nextra-card) {
-  color: var(--w-accent) !important;
-  font-weight: 500 !important;
-  text-decoration: none !important;
-}
-article a:not(.nextra-card):hover {
-  text-decoration: underline !important;
-  text-underline-offset: 2px !important;
-}
-article ul, article ol {
-  font-size: 0.9375rem !important;
-  line-height: 1.75 !important;
-  color: var(--w-text) !important;
-}
-article hr { border-color: var(--w-border) !important; margin: 2rem 0 !important; }
-article strong { color: var(--w-text-strong) !important; font-weight: 600 !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   TABLES
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-article table {
-  width: 100% !important;
-  font-size: 0.875rem !important;
-  border-collapse: collapse !important;
-  border-spacing: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  overflow: visible !important;
-  display: table !important;
-  margin: 1.5rem 0 !important;
-}
-
-article table,
-article table thead,
-article table tbody,
-article table tr {
-  border-top: none !important;
-  border-bottom: none !important;
-}
-article table th,
-article table td {
-  border: none !important;
-}
-
-article thead tr {
-  background: none !important;
-}
-article thead tr th {
-  color: var(--w-text-soft) !important;
-  font-size: 0.8125rem !important;
-  font-weight: 600 !important;
-  padding: 0.5rem 0.875rem !important;
-  text-align: left !important;
-  background: none !important;
-  text-transform: none !important;
-  letter-spacing: normal !important;
-  border-bottom: 1px solid var(--w-border) !important;
-}
-article tbody tr {
-  background: none !important;
-}
-article tbody tr td {
-  padding: 0.5rem 0.875rem !important;
-  color: var(--w-text) !important;
-  border-bottom: 1px solid var(--w-border-soft) !important;
-  vertical-align: top !important;
-  font-size: 0.875rem !important;
-  line-height: 1.5 !important;
-}
-article tbody tr:last-child td { border-bottom: none !important; }
-article tbody tr:hover td { background: var(--w-hover-bg) !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   INLINE CODE
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-article code:not(pre code) {
-  font-size: 0.8125em !important;
-  font-weight: 500 !important;
-  color: var(--w-inline-code-color) !important;
-  background: var(--w-inline-code-bg) !important;
-  border: 1px solid var(--w-inline-code-border) !important;
-  border-radius: 0.3rem !important;
-  padding: 0.1em 0.4em !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   CODE BLOCKS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.nextra-code {
-  margin: 1.25rem 0 !important;
-}
-
-.nextra-code pre, article pre {
-  font-size: 0.8125rem !important;
-  line-height: 1.7 !important;
-  border-radius: 0.625rem !important;
-  border: 1px solid var(--w-border) !important;
-  padding: 0 1rem !important;
-  background: var(--w-code-bg) !important;
-  overflow-x: auto;
-  box-shadow: var(--w-code-shadow) !important;
-}
-
-/* Filename header bar — top half of the code card */
-.nextra-code > div:first-child {
-  background: var(--w-filename-header-bg) !important;
-  border: 1px solid var(--w-border) !important;
-  border-bottom: none !important;
-  border-radius: 0.625rem 0.625rem 0 0 !important;
-  color: var(--w-text-soft) !important;
-}
-
-/* Pre immediately after a filename header — bottom half, connected */
-.nextra-code > div + pre {
-  border-radius: 0 0 0.625rem 0.625rem !important;
-  border-top: none !important;
-  box-shadow: none !important;
-}
-
-/* Copy + word-wrap buttons — consistent size wherever they appear */
-.nextra-code button[title="Copy code"],
-.nextra-code button[title="Toggle word wrap"] {
-  background: var(--w-bg) !important;
-  border: 1px solid var(--w-border) !important;
-  border-radius: 0.375rem !important;
-  padding: 0.3125rem !important;
-  color: var(--w-text-soft) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 1.75rem !important;
-  height: 1.75rem !important;
-  flex-shrink: 0 !important;
-  transition: background 0.12s, color 0.12s, border-color 0.12s !important;
-}
-.nextra-code button[title="Copy code"]:hover,
-.nextra-code button[title="Toggle word wrap"]:hover {
-  background: var(--w-border-soft) !important;
-  border-color: var(--w-accent-border) !important;
-  color: var(--w-text-strong) !important;
-}
-.dark .nextra-code button[title="Copy code"],
-.dark .nextra-code button[title="Toggle word wrap"] {
-  background: var(--w-border-soft) !important;
-  border-color: var(--w-border) !important;
-}
-.dark .nextra-code button[title="Copy code"]:hover,
-.dark .nextra-code button[title="Toggle word wrap"]:hover {
-  background: var(--w-hover-bg) !important;
-  color: var(--w-text-strong) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   CALLOUTS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.nextra-callout > div:first-child {
-  padding-left: 0 !important;
-  padding-right: 0.5rem !important;
-}
-
-.nextra-callout {
-  margin: 1.25rem 0 !important;
-  padding: 0.75rem 1rem !important;
-  align-items: flex-start !important;
-  font-size: 0.875rem !important;
-  line-height: 1.6 !important;
-  /* Left accent bar only — color comes from Nextra's type-specific text class */
-  border: none !important;
-  border-left: 2px solid color-mix(in srgb, currentColor 60%, transparent) !important;
-  border-right: 2px solid color-mix(in srgb, currentColor 60%, transparent) !important;
-  border-radius: 0.625rem !important;
-  /* Subtle tint derived from the accent color, works for all types + dark mode */
-  background-color: color-mix(in srgb, currentColor 8%, transparent) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   CARDS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.nextra-cards { gap: 0.75rem !important; margin-top: 1.25rem !important; }
-.nextra-cards a.nextra-card { margin: 0 !important; }
-
-a.nextra-card {
-  margin: 1rem 0 !important;
-  border: 1px solid var(--w-border) !important;
-  border-radius: 0.625rem !important;
-  background: var(--w-card-bg) !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  transition: border-color 0.15s, box-shadow 0.15s !important;
-  display: flex !important;
-  flex-direction: column !important;
-  text-decoration: none !important;
-}
-
-a.nextra-card:hover {
-  border-color: var(--w-accent-border) !important;
-  box-shadow: 0 0 0 3px var(--w-accent-soft) !important;
-  background: var(--w-card-bg) !important;
-}
-
-a.nextra-card > span {
-  padding: 1rem 1.125rem 0.875rem !important;
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  gap: 0.5rem !important;
-}
-a.nextra-card > span > span {
-  font-size: 0.9rem !important;
-  font-weight: 600 !important;
-  color: var(--w-text-strong) !important;
-  letter-spacing: -0.01em !important;
-  white-space: normal !important;
-  overflow: visible !important;
-  text-overflow: unset !important;
-  flex: 1 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.3em !important;
-}
-a.nextra-card[href^="http"] > span > span::after {
-  content: '↗';
-  font-size: 0.8em;
-  line-height: 1;
-  color: var(--w-text-faint);
-  transition: color 0.15s;
-  font-weight: 400;
-  flex-shrink: 0;
-}
-a.nextra-card[href^="http"]:hover > span > span::after { color: var(--w-accent); }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   TABS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Outer wrapper — spacing only; visual card is split across tablist + panels */
-/* Exclude .nextra-steps: Tabs renders as a Fragment so its tablist becomes a
-   direct child of .nextra-steps, which would otherwise match this selector and
-   strip the ps-6 padding that keeps the connecting line visible. */
-div:has(> [role="tablist"]):not(.nextra-steps) {
-  margin: 1.25rem 0 !important;
-  padding: 0 !important;
-}
-
-/* Tab header bar — top half of the card */
-[role="tablist"] {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.25rem !important;
-  padding: 0.4375rem 0.5rem !important;
-  background: var(--w-border-soft) !important;
-  border: 1px solid var(--w-border) !important;
-  border-radius: 0.625rem 0.625rem 0 0 !important;
-  overflow-x: auto !important;
-  margin: 0 !important;
-}
-/* TabGroup renders as Fragment so there's no wrapper div — apply top
-   spacing directly on the tablist to match .nextra-code margin-top.
-   Exclude tabs inside .nextra-steps where the step layout owns spacing. */
-:not(.nextra-steps) > [role="tablist"] {
-  margin-top: 1.25rem !important;
-}
-
-/* Panels wrapper — bottom half of the card */
-[role="tablist"] + div {
-  border: 1px solid var(--w-border) !important;
-  border-top: none !important;
-  border-radius: 0 0 0.625rem 0.625rem !important;
-  overflow: hidden !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
-/* Individual tab button */
-[role="tab"] {
-  padding: 0.25rem 0.75rem !important;
-  font-size: 0.8125rem !important;
-  font-weight: 500 !important;
-  font-family: inherit !important;
-  color: var(--w-text-soft) !important;
-  border-radius: 0.375rem !important;
-  border: none !important;
-  background: none !important;
-  cursor: pointer !important;
-  transition: color 0.12s, background 0.12s !important;
-  white-space: nowrap !important;
-  line-height: 1.5 !important;
-}
-[role="tab"]:hover {
-  color: var(--w-text-strong) !important;
-  background: var(--w-hover-bg) !important;
-}
-[role="tab"][aria-selected="true"] {
-  background: var(--w-bg) !important;
-  color: var(--w-accent) !important;
-  font-weight: 600 !important;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
-}
-.dark [role="tab"][aria-selected="true"] {
-  background: var(--w-bg) !important;
-  box-shadow: none !important;
-}
-[role="tab"][aria-disabled="true"] {
-  color: var(--w-text-faint) !important;
-  pointer-events: none !important;
-}
-
-/* Panel — no padding by default */
-[role="tabpanel"] {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-/* Nextra injects a hidden h3 anchor as the first child of each panel.
-   It has height:0 via inline style but inherits our article h3 margin,
-   which is what creates the ~29px gap at the top of the panel. */
-[role="tabpanel"] > h3 {
-  margin: 0 !important;
-}
-
-/* Mixed-content panels (text, callouts, etc.) get container padding so
-   content has breathing room; code blocks inside render as normal blocks. */
-[role="tabpanel"]:not(:has(> h3 + .nextra-code:last-child)) {
-  padding: 1rem 1.25rem !important;
-}
-
-/* Code-only panels: single code block is flush — no double border */
-[role="tabpanel"]:has(> h3 + .nextra-code:last-child) .nextra-code {
-  margin: 0 !important;
-}
-[role="tabpanel"]:has(> h3 + .nextra-code:last-child) .nextra-code > div:first-child {
-  border-radius: 0 !important;
-  border-top: none !important;
-  border-left: none !important;
-  border-right: none !important;
-}
-[role="tabpanel"]:has(> h3 + .nextra-code:last-child) .nextra-code pre {
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  margin: 0 !important;
-  padding: 1rem !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   MERMAID DIAGRAMS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* <Mermaid> renders as a plain div > svg with no class. Targeting as a
-   direct child of article avoids matching icon SVGs nested inside callouts. */
-article > div:has(> svg) {
-  margin: 1.25rem 0 !important;
-  overflow-x: auto !important;
-  text-align: center !important;
-}
-article > div:has(> svg) svg {
-  max-width: 100% !important;
-  height: auto !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   DETAILS / SUMMARY
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-details {
-  margin: 1.25rem 0 !important;
-  border: 1px solid var(--w-border) !important;
-  border-radius: 0.625rem !important;
-  background: var(--w-card-bg) !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-}
-
-details summary {
-  display: flex !important;
-  align-items: center !important;
-  cursor: pointer !important;
-  padding: 0.75rem 0.875rem !important;
-  list-style: none !important;
-  user-select: none !important;
-  border-radius: 0 !important;
-  transition: background 0.12s !important;
-}
-details summary::-webkit-details-marker { display: none !important; }
-details summary:hover { background: var(--w-hover-bg) !important; }
-
-/* Separator between header and content when open */
-details[data-expanded] summary {
-  border-bottom: 1px solid var(--w-border-soft) !important;
-}
-
-/* Title text — reset the article h3 margins that bleed in here */
-details summary h3 {
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  color: var(--w-text-strong) !important;
-  letter-spacing: -0.015em !important;
-  line-height: 1.5 !important;
-  margin: 0 !important;
-  padding: 0 0.25rem !important;
-}
-
-/* Arrow icon */
-details summary > svg { color: var(--w-text-soft) !important; flex-shrink: 0 !important; }
-
-/* Permalink icon link */
-details summary a { color: var(--w-text-faint) !important; }
-details summary a:hover { background: var(--w-hover-bg) !important; color: var(--w-text-soft) !important; }
-
-/* Content area — padding lives on the inner div inside the Collapse grid wrapper.
-   Cannot pad the grid wrapper itself: it animates to height 0 when closed, but
-   padding on the grid container would still render and peek through. */
-details > div > div {
-  padding: 0.875rem 1rem !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FILE TREE
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.nextra-filetree {
-  margin: 1.25rem 0 !important;
-  font-size: 0.875rem !important;
-  line-height: 1.6 !important;
-  color: var(--w-text) !important;
-  background: var(--w-card-bg) !important;
-  border: 1px solid var(--w-border) !important;
-  border-radius: 0.625rem !important;
-  padding: 0.875rem 1rem !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.375rem !important;
-  width: 100% !important;
-}
-
-/* File and folder items */
-.nextra-filetree li {
-  color: var(--w-text) !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.25rem !important;
-}
-
-/* Folder item wraps button + nested ul */
-.nextra-filetree li:has(> button) {
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  gap: 0.375rem !important;
-}
-
-/* Folder toggle button */
-.nextra-filetree button {
-  display: flex !important;
-  align-items: center !important;
-  gap: 0.25rem !important;
-  font-size: inherit !important;
-  color: var(--w-text) !important;
-  background: none !important;
-  border: none !important;
-  padding: 0 !important;
-  cursor: pointer !important;
-  text-align: start !important;
-  transition: opacity 0.12s !important;
-}
-.nextra-filetree button:hover { opacity: 0.6 !important; }
-
-/* Icons */
-.nextra-filetree svg { color: var(--w-text-soft) !important; flex-shrink: 0 !important; }
-
-/* Nested folder children */
-.nextra-filetree ul {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.375rem !important;
-  padding-inline-start: 1.125rem !important;
-}
-
-/* Active file/folder — colour driven by --nextra-primary-* but we pin it
-   explicitly so it stays in sync with --w-accent regardless of hue tokens */
-.nextra-filetree [class*="text-primary"] { color: var(--w-accent) !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   STEPS
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* The circle ::before is 33px tall. Our article h3 override sets font-size: 1rem
-   which is smaller than Nextra's default text-2xl. Setting line-height to match
-   the circle height vertically centers the step title text on the circle. */
-.nextra-steps h3 {
-  line-height: 33px !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   BLEED
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Override Nextra's default -mx-4 / md:-mx-8 / 2xl:-mx-24 to match our
-   article's 2.5rem horizontal padding so bleed content truly reaches the edge. */
-.nextra-bleed {
-  margin-left: -2.5rem !important;
-  margin-right: -2.5rem !important;
-  margin-top: 1.25rem !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   COPY PAGE
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Outer wrapper — matches card border/radius language */
-article > div.nextra-border {
-  border: 1px solid var(--w-border) !important;
-  border-radius: 0.625rem !important;
-  background: var(--w-bg) !important;
-  overflow: hidden !important;
-}
-
-/* All buttons (copy + dropdown trigger) */
-article > div.nextra-border button {
-  font-family: inherit !important;
-  font-size: 0.8125rem !important;
-  font-weight: 500 !important;
-  color: var(--w-text-soft) !important;
-  background: none !important;
-  border-radius: 0 !important;
-  padding: 0.375rem 0.75rem !important;
-  height: auto !important;
-  transition: background 0.12s, color 0.12s !important;
-}
-article > div.nextra-border button:hover {
-  background: var(--w-hover-bg) !important;
-  color: var(--w-text-strong) !important;
-}
-
-/* Separator before the dropdown section — handles both direct button
-   sibling and HeadlessUI div wrapper cases */
-article > div.nextra-border > button + * {
-  border-left: 1px solid var(--w-border) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   PREV/NEXT PAGINATION
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Wrapper — top separator only; cards handle their own borders */
-article > div.nextra-border:has(> a) {
-  border: none !important;
-  border-top: 1px solid var(--w-border) !important;
-  background: none !important;
-  padding: 1.5rem 0 0 !important;
-  gap: 0.75rem !important;
-  align-items: stretch !important;
-}
-
-/* Each prev/next link as a card */
-article > div.nextra-border:has(> a) > a {
-  border: 1px solid var(--w-border) !important;
-  border-radius: 0.625rem !important;
-  background: var(--w-card-bg) !important;
-  padding: 0.875rem 1.125rem !important;
-  font-size: 0.875rem !important;
-  font-weight: 500 !important;
-  color: var(--w-text-soft) !important;
-  text-decoration: none !important;
-  flex: 1 !important;
-  gap: 0.5rem !important;
-  transition: border-color 0.15s, box-shadow 0.15s, color 0.15s !important;
-}
-article > div.nextra-border:has(> a) > a:last-child {
-  justify-content: flex-end !important;
-  text-align: end !important;
-}
-
-article > div.nextra-border:has(> a) > a:hover {
-  border-color: var(--w-accent-border) !important;
-  color: var(--w-text-strong) !important;
-  background: var(--w-card-bg) !important;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FOOTER
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-article > div[class*="text-end"] { font-size: 0.75rem !important; color: var(--w-text-faint) !important; }
-
-body > div:has(> footer) { background: var(--w-bg) !important; }
-
-footer {
-  font-size: 0.8125rem !important;
-  color: var(--w-text-faint) !important;
-  padding-top: 2.5rem !important;
-  padding-bottom: 2.5rem !important;
-}
-
-/* Override Nextra's x:flex row layout so columns section sits above the bar.
-   Needs element+class specificity (0,1,1) to beat .x:flex (0,1,0). */
-footer.flux-footer {
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch !important;
-  justify-content: flex-start !important;
-  padding: 0 2.5rem 2.5rem !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-}
-
-/* Nextra renders an <hr> above the <footer> — hide it since our border-top replaces it */
-div:has(> footer.flux-footer) > hr { display: none !important; }
-
-
-/* With-columns layout: brand on left, nav columns on right */
-.w-footer-with-cols {
-  display: flex;
-  flex-direction: row;
-  gap: 3rem;
-  align-items: flex-start;
-  padding: 3rem 1rem 2.5rem;
-  border-top: 1px solid var(--w-border);
-}
-
-/* Brand column: copyright stacked above social icons */
-.w-footer-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  min-width: 180px;
-  flex-shrink: 0;
-}
-
-/* Nav columns grid — flex: 1 so it fills remaining width */
-.w-footer-columns {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 2rem 1.5rem;
-  flex: 1;
-  min-width: 0;
-}
-
-/* No-columns case: bar is first child and needs the top separator */
-footer.flux-footer > .w-footer-bar:first-child {
-  border-top: 1px solid var(--w-border);
-  padding-top: 2rem;
-}
-
-.w-footer-col-title {
-  font-size: 0.6875rem !important;
-  font-weight: 600 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  color: var(--w-text-strong) !important;
-  margin: 0 0 0.75rem !important;
-}
-
-.w-footer-col ul {
-  list-style: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 0.5rem !important;
-}
-
-.w-footer-col ul li a {
-  color: var(--w-text-soft) !important;
-  text-decoration: none !important;
-  font-size: 0.8125rem !important;
-  transition: color 0.12s !important;
-}
-
-.w-footer-col ul li a:hover {
-  color: var(--w-text-strong) !important;
-}
-
-/* Bottom bar — copyright on the left, social icons on the right */
-.w-footer-bar {
-  display: flex !important;
-  align-items: flex-start !important;
-  justify-content: space-between !important;
-  gap: 1rem !important;
-  flex-wrap: wrap !important;
-  padding-left: 1rem !important;
-  padding-right: 1rem !important;
-}
-
-.w-footer-copy {
-  color: var(--w-text-faint);
-  font-size: 0.8125rem;
-}
-
-.w-footer-social {
-  display: flex;
-  align-items: center;
-  gap: 0.875rem;
-}
-
-.w-footer-social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--w-text-faint);
-  text-decoration: none !important;
-  transition: color 0.12s;
-}
-
-.w-footer-social-link:hover {
-  color: var(--w-text-strong);
-}
-
-.w-footer-bar-right {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.75rem;
-}
-
-.w-footer-powered {
-  font-size: 0.8125rem;
-  color: var(--w-text-faint);
-  text-decoration: none !important;
-  transition: color 0.12s;
-  white-space: nowrap;
-}
-
-/* When rendered as a direct child of the footer (columns layout), pin to bottom-right */
-footer.flux-footer > .w-footer-powered {
-  display: block;
-  align-self: flex-end;
-  margin-top: 1rem;
-  padding-right: 1rem;
-}
-.w-footer-powered:hover { color: var(--w-text-soft); }
-
-.nextra-border { border-color: var(--w-border) !important; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   MISC
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.subheading-anchor { opacity: 0; margin-left: 0.375rem; font-size: 0.75em; transition: opacity 0.15s; }
-*:hover > .subheading-anchor, .subheading-anchor:focus { opacity: 0.4; }
-
-::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--w-scrollbar-thumb); border-radius: 999px; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   API REFERENCE
-   Styles for the OpenAPI-generated endpoint pages. Components live in
-   src/components/api/*; class names are stable contract surface.
-
-   Layout
-   - .api-endpoint-grid       two-column grid: main content + sticky aside (samples)
-   - .api-endpoint-main       left column
-   - .api-endpoint-aside      right column, sticky on wide screens
-
-   Endpoint header
-   - .api-endpoint-meta       method + path bar
-   - .api-method-{get,post,put,patch,delete}
-   - .api-endpoint-tag        tag pill
-   - .api-endpoint-deprecated badge
-
-   Parameters
-   - .api-param-section       wrapper per param kind (path/query/header/cookie)
-   - .api-param-table         the actual table
-
-   Schema tree
-   - .api-schema-block        outer card
-   - .api-schema-row          one row in the tree
-   - .api-schema-toggle       expand/collapse button
-
-   Response
-   - .api-response-block      one response (status 200, 404, etc.)
-   - .api-status-{2xx,3xx,4xx,5xx,default}
-
-   Code switcher (request/response samples in the aside)
-   - .api-code-switcher
-
-   Try-it interactive form
-   - .api-tryit
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ── Layout ───────────────────────────────────────────────────────────── */
-
-.api-endpoint-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
-  gap: 2.5rem;
-  align-items: start;
-}
-
-.api-endpoint-main { min-width: 0; }
-
-.api-endpoint-aside {
-  position: sticky;
-  top: calc(var(--nextra-navbar-height) + 1.5rem);
-  max-height: calc(100vh - var(--nextra-navbar-height) - 3rem);
-  overflow-y: auto;
-  min-width: 0;
-}
-
-.api-endpoint-main > h1 {
-  font-size: 1.875rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--w-text-strong);
-  margin: 0 0 1rem;
-}
-
-.api-endpoint-main > h2 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--w-text-strong);
-  margin: 2.25rem 0 0.875rem;
-  letter-spacing: -0.01em;
-}
-
-/* ── Endpoint meta bar (method + path) ─────────────────────────────────── */
-
-.api-endpoint-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.625rem 0.875rem;
-  background: var(--w-code-bg);
-  border: 1px solid var(--w-border);
-  border-radius: 8px;
-  margin: 0 0 1.75rem;
-  flex-wrap: wrap;
-}
-
-.api-method {
-  display: inline-flex;
-  align-items: center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  padding: 0.25rem 0.5rem;
-  border-radius: 5px;
-  color: #ffffff;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.api-method-get    { background: var(--w-method-get); }
-.api-method-post   { background: var(--w-method-post); }
-.api-method-put    { background: var(--w-method-put); }
-.api-method-patch  { background: var(--w-method-patch); }
-.api-method-delete { background: var(--w-method-delete); }
-
-.api-endpoint-path {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--w-text-strong);
-  background: transparent;
-  border: none;
-  padding: 0;
-  word-break: break-all;
-}
-
-.api-endpoint-tag {
-  font-size: 0.6875rem;
-  font-weight: 500;
-  background: var(--w-border-soft);
-  color: var(--w-text-soft);
-  padding: 0.1875rem 0.5rem;
-  border-radius: 999px;
-  text-transform: capitalize;
-}
-
-.api-endpoint-tag + .api-endpoint-tag,
-.api-endpoint-meta > .api-endpoint-tag:first-of-type { margin-left: auto; }
-.api-endpoint-meta > .api-endpoint-tag + .api-endpoint-tag { margin-left: 0; }
-
-.api-endpoint-deprecated {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  background: color-mix(in srgb, var(--w-method-delete) 12%, transparent);
-  color: var(--w-method-delete);
-  border: 1px solid color-mix(in srgb, var(--w-method-delete) 30%, transparent);
-  padding: 0.1875rem 0.5rem;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-/* Combined endpoint bar: meta row + Try-it accordion. The header keeps the
-   same chrome as the standalone .api-endpoint-meta; when expanded, the
-   accordion panel inherits the bar's frame, no separate card needed. */
-.api-endpoint-bar {
-  background: var(--w-code-bg);
-  border: 1px solid var(--w-border);
-  border-radius: 8px;
-  margin: 0 0 1.75rem;
-  overflow: hidden;
-}
-
-.api-endpoint-bar-header {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.625rem 0.875rem;
-  flex-wrap: wrap;
-}
-
-.api-endpoint-tryit-toggle {
-  margin-left: auto;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--w-text-strong);
-  background: var(--w-bg);
-  border: 1px solid var(--w-border);
-  border-radius: 0.375rem;
-  padding: 0.3125rem 0.625rem;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
-}
-
-.api-endpoint-tryit-toggle:hover {
-  background: var(--w-border-soft);
-  border-color: var(--w-accent-border);
-}
-
-.api-endpoint-tryit-chevron {
-  transition: transform 0.15s;
-  color: var(--w-text-soft);
-}
-
-.api-endpoint-bar[data-open="true"] .api-endpoint-tryit-chevron {
-  transform: rotate(180deg);
-}
-
-.api-endpoint-bar[data-open="true"] .api-endpoint-tryit-toggle {
-  background: var(--w-accent-soft);
-  border-color: var(--w-accent-border);
-  color: var(--w-accent);
-}
-
-.api-endpoint-tryit-panel {
-  border-top: 1px solid var(--w-border);
-  background: var(--w-bg);
-}
-
-/* Strip the .api-tryit card's outer chrome when it's rendered inside the
-   accordion — the bar's frame already provides one. */
-.api-endpoint-tryit-panel .api-tryit {
-  border: none;
-  border-radius: 0;
-  margin: 0;
-  background: transparent;
-}
-
-/* The TryIt component shows its own method/path header; hide it here since
-   the bar's header already shows that info. */
-.api-endpoint-tryit-panel .api-tryit-header {
-  display: none;
-}
-
-/* ── Parameters table ─────────────────────────────────────────────────── */
-
-.api-param-section { margin: 0 0 1.5rem; }
-
-.api-param-section-title {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--w-text-soft);
-  margin: 0 0 0.5rem;
-}
-
-.api-param-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-  border: 1px solid var(--w-border);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.api-param-table thead { background: var(--w-border-soft); }
-
-.api-param-table th {
-  text-align: left;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--w-text-soft);
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid var(--w-border);
-}
-
-.api-param-table td {
-  padding: 0.625rem 0.75rem;
-  border-bottom: 1px solid var(--w-border-soft);
-  vertical-align: top;
-  color: var(--w-text);
-  line-height: 1.5;
-}
-
-.api-param-table tr:last-child td { border-bottom: none; }
-
-.api-param-table td code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--w-text-strong);
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
-/* ── Schema tree ──────────────────────────────────────────────────────── */
-
-.api-schema-block {
-  border: 1px solid var(--w-border);
-  border-radius: 8px;
-  padding: 0.25rem 0.875rem;
-  background: var(--w-bg);
-  margin-bottom: 1rem;
-}
-
-.api-schema-root,
-.api-schema-children {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.api-schema-row {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--w-border-soft);
-}
-
-.api-schema-row:last-child { border-bottom: none; }
-
-.api-schema-row-head {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.api-schema-toggle {
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--w-border);
-  background: var(--w-bg);
-  border-radius: 4px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--w-text-soft);
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.api-schema-toggle:hover {
-  background: var(--w-hover-bg);
-  color: var(--w-text-strong);
-  border-color: var(--w-text-faint);
-}
-
-.api-schema-name {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--w-text-strong);
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
-.api-schema-type {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  color: var(--w-accent);
-  font-weight: 500;
-}
-
-.api-schema-required {
-  font-size: 0.625rem;
-  font-weight: 700;
-  color: var(--w-method-delete);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.api-schema-description {
-  margin-top: 0.25rem;
-  padding-left: 26px;
-  font-size: 0.8125rem;
-  color: var(--w-text-soft);
-  line-height: 1.55;
-}
-
-/* ── Response block ───────────────────────────────────────────────────── */
-
-.api-response-block { margin: 0 0 1.25rem; }
-
-.api-response-header {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-  margin: 0 0 0.625rem;
-}
-
-.api-response-status {
-  display: inline-flex;
-  align-items: center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.25rem 0.5rem;
-  border-radius: 5px;
-  color: #ffffff;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.api-status-2xx     { background: var(--w-status-2xx); }
-.api-status-3xx     { background: var(--w-status-3xx); }
-.api-status-4xx     { background: var(--w-status-4xx); }
-.api-status-5xx     { background: var(--w-status-5xx); }
-.api-status-default { background: var(--w-text-faint); }
-
-/* Response tabs (main column): uses the global [role="tablist"] /
-   [role="tab"] styling — same card pattern as Nextra tabs — with a
-   color-coded status dot inside each tab button. */
-.api-response-tabs [role="tab"] {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 0.4375rem !important;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
-}
-
-.api-response-tab-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-.api-response-panel-meta {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-  margin: 0 0 0.875rem;
-  font-size: 0.875rem;
-  color: var(--w-text);
-}
-
-.api-response-panel-meta .api-response-contenttype {
-  margin-left: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  color: var(--w-text-faint);
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
-.api-response-description {
-  color: var(--w-text);
-  font-size: 0.875rem;
-}
-
-.api-response-contenttype {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  color: var(--w-text-faint);
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin-left: auto;
-}
-
-/* ── Auth requirements ────────────────────────────────────────────────── */
-
-.api-auth-none {
-  color: var(--w-text-soft);
-  font-style: italic;
-  font-size: 0.875rem;
-  margin: 0 0 1rem;
-}
-
-.api-auth-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1rem;
-}
-
-.api-auth-item {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.625rem;
-  padding: 0.625rem 0.875rem;
-  border: 1px solid var(--w-border);
-  border-radius: 6px;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.api-auth-item:last-child { margin-bottom: 0; }
-
-.api-auth-name {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--w-text-strong);
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
-.api-auth-description { color: var(--w-text-soft); }
-
-.api-auth-scopes {
-  font-size: 0.75rem;
-  color: var(--w-text-faint);
-  margin-left: auto;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-
-/* ── Code switcher (request / response samples) ─────────────────────────
-   Modelled on the existing .nextra-code "filename header + pre" card so
-   API code samples look like every other code block in the docs:
-     • toolbar = top half (filename-header-bg, rounded TOP only)
-     • body    = bottom half (code-bg, rounded BOTTOM only)
-     • border-radius matches the .nextra-code convention (0.625rem)
-   Inner Nextra code chrome (its own border/radius/buttons) is neutralised
-   so the switcher's outer frame is the only one visible. */
-
-.api-code-switcher {
-  margin: 0 0 1rem;
-}
-
-.api-code-switcher-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: var(--w-filename-header-bg);
-  border: 1px solid var(--w-border);
-  border-bottom: none;
-  border-radius: 0.625rem 0.625rem 0 0;
-  color: var(--w-text-soft);
-}
-
-.api-code-switcher-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--w-text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  flex-shrink: 0;
-}
-
-/* Pill-shaped dropdown trigger: terminal icon prefix + label + up/down chevron.
-   Wrapper provides the visual chrome; the underlying <select> is transparent
-   and fills the wrapper so a click anywhere opens the native menu. */
-.api-code-switcher-select-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  background: var(--w-bg);
-  border: 1px solid var(--w-border);
-  border-radius: 0.375rem;
-  padding: 0 0.625rem 0 0.5rem;
-  margin-left: auto;
-  transition: background 0.12s, border-color 0.12s;
-}
-
-.api-code-switcher-select-wrap:hover {
-  border-color: var(--w-text-faint);
-}
-
-.api-code-switcher-select-wrap:focus-within {
-  border-color: var(--w-accent);
-  box-shadow: 0 0 0 2px var(--w-accent-soft);
-}
-
-.api-code-switcher-select-icon {
-  color: var(--w-text);
-  pointer-events: none;
-  flex-shrink: 0;
-  margin-right: 0.375rem;
-}
-
-.api-code-switcher-select-chevron {
-  color: var(--w-text-soft);
-  pointer-events: none;
-  flex-shrink: 0;
-  margin-left: 0.25rem;
-}
-
-.api-code-switcher-select {
-  appearance: none;
-  -webkit-appearance: none;
-  background: transparent;
-  border: none;
-  outline: none;
-  margin: 0;
-  padding: 0.3125rem 0;
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--w-text-strong);
-  cursor: pointer;
-}
-
-/* Response variant: inline tabs in the toolbar replace the dropdown, and the
-   selected status code's description is rendered as a sub-header strip between
-   the toolbar and the code body. */
-.api-code-switcher-tablist {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.125rem;
-  margin-left: auto;
-}
-
-/* Mirrors the [role="tab"] styling in this file so the response tabs read
-   the same as Nextra tabs (soft text, accent on selected, subtle lift). */
-.api-code-switcher-tab {
-  font-family: inherit;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--w-text-soft);
-  background: none;
-  border: none;
-  border-radius: 0.375rem;
-  padding: 0.25rem 0.75rem;
-  cursor: pointer;
-  transition: color 0.12s, background 0.12s;
-  line-height: 1.5;
-  white-space: nowrap;
-}
-
-.api-code-switcher-tab:hover {
-  color: var(--w-text-strong);
-  background: var(--w-hover-bg);
-}
-
-.api-code-switcher-tab[aria-pressed="true"] {
-  background: var(--w-bg);
-  color: var(--w-accent);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-.dark .api-code-switcher-tab[aria-pressed="true"] {
-  background: var(--w-bg);
-  box-shadow: none;
-}
-
-.api-code-switcher-subheader {
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
-  color: var(--w-text-soft);
-  background: var(--w-filename-header-bg);
-  border-left: 1px solid var(--w-border);
-  border-right: 1px solid var(--w-border);
-  border-bottom: 1px solid var(--w-border);
-}
-
-/* Copy button — same dimensions and styling as .nextra-code button[title="Copy code"]
-   so the request/response switcher's copy affordance is visually identical to
-   the per-block copy button used in standalone code blocks. Icon-only. */
-.api-code-switcher-copy {
-  background: var(--w-bg);
-  color: var(--w-text-soft);
-  border: 1px solid var(--w-border);
-  border-radius: 0.375rem;
-  padding: 0.3125rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  flex-shrink: 0;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
-}
-
-.api-code-switcher-copy:hover {
-  background: var(--w-border-soft);
-  color: var(--w-text-strong);
-  border-color: var(--w-accent-border);
-}
-
-.dark .api-code-switcher-copy {
-  background: var(--w-border-soft);
-  border-color: var(--w-border);
-}
-
-.dark .api-code-switcher-copy:hover {
-  background: var(--w-hover-bg);
-  color: var(--w-text-strong);
-}
-
-.api-code-switcher-copy[data-copied="true"],
-.dark .api-code-switcher-copy[data-copied="true"] {
-  color: var(--w-method-post);
-  border-color: var(--w-method-post);
-  background: color-mix(in srgb, var(--w-method-post) 10%, transparent);
-}
-
-.api-code-switcher-body {
-  background: var(--w-code-bg);
-  border: 1px solid var(--w-border);
-  border-top: none;
-  border-radius: 0 0 0.625rem 0.625rem;
-  box-shadow: var(--w-code-shadow);
-}
-
-/* Neutralise the inner Nextra code-block chrome; the body provides the frame.
-   The \`.nextra-code\` rules elsewhere in this file would otherwise add their
-   own border, radius, shadow, and background on top of ours. */
-.api-code-switcher-pane,
-.api-code-switcher-pane > div {
-  margin: 0;
-  padding: 0;
-}
-
-.api-code-switcher-pane .nextra-code {
-  margin: 0 !important;
-  border-radius: 0 !important;
-}
-
-.api-code-switcher-pane .nextra-code > div:first-child {
-  display: none !important;
-}
-
-.api-code-switcher-pane pre,
-.api-code-switcher-pane .nextra-code pre {
-  margin: 0 !important;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  background: transparent !important;
-  /* Match the tab-panel code padding so request/response samples have the
-     same breathing room as the in-content code blocks shown in tabs. */
-  padding: 1rem !important;
-}
-
-/* The toolbar already exposes a single Copy button driven by the switcher,
-   so per-block copy/word-wrap buttons inside each pane are redundant. */
-.api-code-switcher-pane .nextra-code button[title="Copy code"],
-.api-code-switcher-pane .nextra-code button[title="Toggle word wrap"] {
-  display: none !important;
-}
-
-/* ── Try-it interactive form ──────────────────────────────────────────── */
-
-.api-tryit {
-  border: 1px solid var(--w-border);
-  border-radius: 8px;
-  padding: 1rem 1.125rem 1.125rem;
-  background: var(--w-bg);
-  margin: 0 0 1.5rem;
-}
-
-.api-tryit-header {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  margin: 0 0 1rem;
-  padding-bottom: 0.875rem;
-  border-bottom: 1px solid var(--w-border-soft);
-  flex-wrap: wrap;
-}
-
-.api-tryit-path {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--w-text-strong);
-  background: transparent;
-  border: none;
-  padding: 0;
-  word-break: break-all;
-}
-
-.api-tryit-section {
-  border: none;
-  padding: 0;
-  margin: 0 0 0.875rem;
-}
-
-.api-tryit-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3125rem;
-  margin: 0 0 0.75rem;
-}
-
-.api-tryit-field:last-child { margin-bottom: 0; }
-
-.api-tryit-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--w-text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.api-tryit-hint {
-  font-weight: 400;
-  color: var(--w-text-faint);
-  text-transform: none;
-  letter-spacing: 0;
-  font-size: 0.6875rem;
-}
-
-.api-tryit-input,
-.api-tryit-textarea {
-  width: 100%;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.8125rem;
-  padding: 0.4375rem 0.625rem;
-  background: var(--w-bg);
-  border: 1px solid var(--w-border);
-  border-radius: 6px;
-  color: var(--w-text-strong);
-  line-height: 1.45;
-}
-
-.api-tryit-textarea {
-  min-height: 6rem;
-  resize: vertical;
-}
-
-.api-tryit-input:focus,
-.api-tryit-textarea:focus {
-  outline: none;
-  border-color: var(--w-accent);
-  box-shadow: 0 0 0 3px var(--w-accent-soft);
-}
-
-.api-tryit-send {
-  background: var(--w-accent);
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1.125rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  font-family: inherit;
-  transition: opacity 0.12s, transform 0.06s;
-}
-
-.api-tryit-send:hover  { opacity: 0.9; }
-.api-tryit-send:active { transform: translateY(1px); }
-
-.api-tryit-send:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.api-tryit-error {
-  background: color-mix(in srgb, var(--w-method-delete) 10%, transparent);
-  border: 1px solid color-mix(in srgb, var(--w-method-delete) 30%, transparent);
-  color: var(--w-text-strong);
-  padding: 0.625rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  margin: 1rem 0 0;
-}
-
-.api-tryit-response {
-  margin: 1rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid var(--w-border-soft);
-}
-
-.api-tryit-response-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 0.75rem;
-  font-size: 0.875rem;
-  color: var(--w-text);
-}
-
-.api-tryit-response-headers {
-  font-size: 0.8125rem;
-  margin: 0 0 0.75rem;
-  color: var(--w-text-soft);
-}
-
-.api-tryit-response-headers summary {
-  cursor: pointer;
-  color: var(--w-text-soft);
-  font-weight: 500;
-}
-
-.api-tryit-response-headers summary:hover { color: var(--w-text-strong); }
-
-.api-tryit-response-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 0 0.5rem;
-}
-
-.api-tryit-response-label {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: var(--w-text-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.api-tryit-response-body {
-  background: var(--w-code-bg);
-  border: 1px solid var(--w-border);
-  border-radius: 6px;
-  padding: 0.75rem 0.875rem;
-  font-size: 0.8125rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  max-height: 24rem;
-  overflow: auto;
-  margin: 0;
-  color: var(--w-text);
-  line-height: 1.55;
-}
-
-/* ── Sidebar method pills ──────────────────────────────────────────────
-   API endpoint sidebar items get a small color-coded HTTP method pill
-   prefixed via ::before. Method is inferred from the operation_id prefix
-   in the href (e.g. \`get_pipeline\`, \`list_pipelines\`, \`post_pipeline\`).
-   Operations whose names don't start with a method (\`checkpoint_\`,
-   \`commit_\`, \`http_input\`, \`start_transaction\`, etc.) are listed
-   explicitly in the matched-ops selector and the per-method content rules. */
-
-/* The set of API hrefs that get a pill. Extend both this group and the
-   matching per-method content block below when adding new endpoints. */
-:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
-  [href*="/get_"], [href*="/list_"], [href*="/post_"], [href*="/put_"],
-  [href*="/patch_"], [href*="/delete_"],
-  [href$="/checkpoint_pipeline"], [href$="/commit_transaction"],
-  [href$="/completion_status"], [href$="/completion_token"],
-  [href$="/http_input"], [href$="/http_output"],
-  [href$="/pipeline_adhoc_sql"], [href$="/reset_status"],
-  [href$="/start_samply_profile"], [href$="/start_transaction"],
-  [href$="/sync_checkpoint"]
-) {
-  display: flex !important;
-  align-items: center !important;
-}
-
-:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
-  [href*="/get_"], [href*="/list_"], [href*="/post_"], [href*="/put_"],
-  [href*="/patch_"], [href*="/delete_"],
-  [href$="/checkpoint_pipeline"], [href$="/commit_transaction"],
-  [href$="/completion_status"], [href$="/completion_token"],
-  [href$="/http_input"], [href$="/http_output"],
-  [href$="/pipeline_adhoc_sql"], [href$="/reset_status"],
-  [href$="/start_samply_profile"], [href$="/start_transaction"],
-  [href$="/sync_checkpoint"]
-)::before {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.5625rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #ffffff;
-  border-radius: 4px;
-  padding: 0.1875rem 0.4375rem;
-  margin-right: 0.5rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-/* Per-method content + colour. Both the prefix-based and explicit op
-   selectors are listed here so the right pill renders for each href. */
-:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
-  [href*="/get_"], [href*="/list_"],
-  [href$="/completion_status"], [href$="/completion_token"],
-  [href$="/pipeline_adhoc_sql"], [href$="/reset_status"]
-)::before {
-  content: "GET";
-  background: var(--w-method-get);
-}
-
-:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
-  [href*="/post_"],
-  [href$="/checkpoint_pipeline"], [href$="/commit_transaction"],
-  [href$="/http_input"], [href$="/http_output"],
-  [href$="/start_samply_profile"], [href$="/start_transaction"],
-  [href$="/sync_checkpoint"]
-)::before {
-  content: "POST";
-  background: var(--w-method-post);
-}
-
-:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"][href*="/put_"]::before {
-  content: "PUT";
-  background: var(--w-method-put);
-}
-
-:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"][href*="/patch_"]::before {
-  content: "PATCH";
-  background: var(--w-method-patch);
-}
-
-:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"][href*="/delete_"]::before {
-  content: "DELETE";
-  background: var(--w-method-delete);
-}
-
-/* ── API reference page layout (theme-portable) ────────────────────────
-   Repositions the samples aside into the outer grid's TOC slot (col 4) so
-   article width and footer alignment stay unchanged on API pages. Relies on:
-     • Each theme's outer grid having article in col 3, TOC in col 4
-     • Each theme defining \`--w-grid-cols-api\` (its outer grid template with
-       col 4 widened for API pages)
-     • API pages setting \`toc: false\` in MDX frontmatter, so col 4 is unused
-   Below 1280px the outer grid collapses (theme-side), and the inner endpoint
-   grid stacks via the rule further down. */
-
-@media (min-width: 1280px) {
-  /* Swap the outer grid template to the API variant when the page contains
-     an .api-endpoint-grid. The footer's separate grid wrapper gets the same
-     swap so its col-3 children stay aligned with the article column. */
-  div:has(> aside.nextra-sidebar):has(.api-endpoint-grid) {
-    grid-template-columns: var(--w-grid-cols-api) !important;
-  }
-  body:has(.api-endpoint-grid) > div:has(> footer) {
-    grid-template-columns: var(--w-grid-cols-api) !important;
-  }
-
-  /* Article subgrid: claim cols 3-4 and pass them through so descendants
-     can place themselves into the article or the samples aside slot. */
-  article:has(.api-endpoint-grid) {
-    grid-column: 3 / span 2 !important;
-    max-width: none !important;
-    display: grid !important;
-    grid-template-columns: subgrid !important;
-    grid-auto-rows: auto;
-    column-gap: 0 !important;
-  }
-
-  /* By default every direct article child stays in col 1 (article width). */
-  article:has(.api-endpoint-grid) > * {
-    grid-column: 1 !important;
-    min-width: 0;
-  }
-
-  /* Nextra wraps MDX content in <main>; thread the subgrid through it so
-     .api-endpoint-grid inside can still reach the TOC slot. */
-  article:has(.api-endpoint-grid) > main {
-    grid-column: 1 / -1 !important;
-    display: grid !important;
-    grid-template-columns: subgrid !important;
-    gap: 0 !important;
-  }
-  article:has(.api-endpoint-grid) > main > * {
-    grid-column: 1 !important;
-    min-width: 0;
-  }
-
-  /* The endpoint grid itself: place .api-endpoint-main in col 1 (article),
-     .api-endpoint-aside in col 2 (TOC slot). */
-  article:has(.api-endpoint-grid) > main > .api-endpoint-grid {
-    grid-column: 1 / -1 !important;
-    display: grid !important;
-    grid-template-columns: subgrid !important;
-    gap: 0 !important;
-  }
-  article:has(.api-endpoint-grid) > main > .api-endpoint-grid > .api-endpoint-main {
-    grid-column: 1 !important;
-    min-width: 0;
-  }
-  article:has(.api-endpoint-grid) > main > .api-endpoint-grid > .api-endpoint-aside {
-    grid-column: 2 !important;
-    min-width: 0;
-    padding-left: 2rem;
-  }
-}
-
-/* ── Responsive: stack the inner endpoint grid on narrow screens ──────── */
-
-/* Matches the breakpoint where each theme's outer TOC column disappears. */
-@media (max-width: 1279px) {
-  .api-endpoint-grid {
-    grid-template-columns: 1fr;
-    gap: 1.75rem;
-  }
-  .api-endpoint-aside {
-    position: static;
-    max-height: none;
-    overflow: visible;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   LOGO IMAGE (light / dark mode switching)
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.logo-dark { display: none; }
-.dark .logo-light { display: none; }
-.dark .logo-dark { display: block; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   MOBILE
-   Shared responsive rules. Layout-level breakpoints (grid columns, sidebar
-   visibility) live in each theme's style.css.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Tablet & smaller: tighten article horizontal padding and matching bleed. */
-@media (max-width: 900px) {
-  article                  { padding: 0 1.75rem 4.5rem !important; }
-  .nextra-bleed            { margin-left: -1.75rem !important; margin-right: -1.75rem !important; }
-}
-
-/* Phone: keep things compact and prevent horizontal overflow. */
-@media (max-width: 767px) {
-  /* Article padding matches forge mobile rule; bleed follows. */
-  .nextra-bleed            { margin-left: -1.25rem !important; margin-right: -1.25rem !important; }
-
-  /* Typography scales down — keep headings readable without dwarfing body. */
-  article h1               { font-size: 1.5rem !important; }
-  article h1 + p           { font-size: 0.9375rem !important; margin-bottom: 1.25rem !important; }
-  article h2               { font-size: 1.0625rem !important; margin-top: 1.875rem !important; }
-  article h3               { font-size: 0.9375rem !important; margin-top: 1.5rem !important; }
-
-  /* Tables overflow horizontally within the article column instead of forcing
-     the whole page to scroll. \`display: block\` is needed because table layout
-     ignores overflow on the table element itself. */
-  article table {
-    display: block !important;
-    width: 100% !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Code blocks: trim the inset so long lines don't get clipped too aggressively. */
-  .nextra-code pre, article pre { padding: 0 0.75rem !important; }
-
-  /* Cards collapse to a single column. */
-  .nextra-cards            { grid-template-columns: 1fr !important; }
-
-  /* Prev/next pagination stacks so each card is full-width and tappable. */
-  article > div.nextra-border:has(> a) {
-    flex-direction: column !important;
-  }
-  article > div.nextra-border:has(> a) > a:last-child {
-    justify-content: flex-start !important;
-    text-align: start !important;
-  }
-
-  /* Footer with columns: stack brand block above the link grid; reduce padding. */
-  footer.flux-footer      { padding: 0 1.25rem 2rem !important; }
-  .w-footer-with-cols {
-    flex-direction: column !important;
-    gap: 2rem !important;
-    padding: 2rem 1rem 1.5rem !important;
-  }
-  .w-footer-columns {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 1.5rem 1rem !important;
-  }
-  .w-footer-brand          { min-width: 0 !important; }
-  footer.flux-footer > .w-footer-powered { padding-right: 0 !important; align-self: flex-start !important; }
-}
-
-/* Very narrow phones: drop footer link columns to a single stack. */
-@media (max-width: 420px) {
-  article h1               { font-size: 1.375rem !important; }
-  .w-footer-columns        { grid-template-columns: 1fr !important; }
-}
-
+const FLUX_THEME_CSS = `
 /*
  * Flux Theme
- * Defines design tokens and layout. Component styles live in ../components.css.
+ * Defines design tokens and layout. Component styles live in ./components.mjs.
  */
 
 
@@ -2136,6 +169,39 @@ html {
 }
 
 body { background-color: var(--w-bg); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLUX FOOTER — overrides for the flux-footer class
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Override Nextra's x:flex row layout so columns section sits above the bar.
+   Needs element+class specificity (0,1,1) to beat .x:flex (0,1,0). */
+footer.flux-footer {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  padding: 0 2.5rem 2.5rem !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Nextra renders an <hr> above the <footer> — hide it since our border-top replaces it */
+div:has(> footer.flux-footer) > hr { display: none !important; }
+
+/* No-columns case: bar is first child and needs the top separator */
+footer.flux-footer > .w-footer-bar:first-child {
+  border-top: 1px solid var(--w-border);
+  padding-top: 2rem;
+}
+
+/* When rendered as a direct child of the footer (columns layout), pin to bottom-right */
+footer.flux-footer > .w-footer-powered {
+  display: block;
+  align-self: flex-end;
+  margin-top: 1rem;
+  padding-right: 1rem;
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    SIDEBAR LOGO — pinned to very top of sidebar column
@@ -2691,8 +757,1157 @@ div:has(> aside.nextra-sidebar)::before {
 
 .nextra-toc > div > div:last-child { display: none !important; }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLUX CTA BUTTON — inline header call-to-action
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.flux-cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ffffff !important;
+  background: var(--w-accent);
+  padding: 0.375rem 0.875rem;
+  border-radius: 0.375rem;
+  text-decoration: none !important;
+  transition: opacity 0.12s;
+  white-space: nowrap;
+}
+.flux-cta-button:hover { opacity: 0.9; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLUX HIDDEN NAVBAR — utility to hide the navbar entirely
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.flux-hidden-navbar .nextra-navbar { display: none !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLUX SIDEBAR TABS — documentation section switcher above the sidebar tree
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.flux-sidebar-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: var(--w-border-soft);
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.flux-sidebar-tabs button {
+  flex: 1;
+  padding: 0.375rem 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--w-text-soft);
+  background: none;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+  font-family: inherit;
+}
+.flux-sidebar-tabs button:hover {
+  color: var(--w-text-strong);
+}
+.flux-sidebar-tabs button[data-active="true"] {
+  background: var(--w-bg);
+  color: var(--w-text-strong);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   API REFERENCE — Flux-specific overrides
+   Styles for the OpenAPI-generated endpoint pages. Components live in
+   src/components/api/*; class names are stable contract surface.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Layout ───────────────────────────────────────────────────────────── */
+
+.api-endpoint-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 28rem);
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.api-endpoint-main { min-width: 0; }
+
+.api-endpoint-aside {
+  position: sticky;
+  top: calc(var(--nextra-navbar-height) + 1.5rem);
+  max-height: calc(100vh - var(--nextra-navbar-height) - 3rem);
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.api-endpoint-main > h1 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--w-text-strong);
+  margin: 0 0 1rem;
+}
+
+.api-endpoint-main > h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--w-text-strong);
+  margin: 2.25rem 0 0.875rem;
+  letter-spacing: -0.01em;
+}
+
+/* ── Endpoint meta bar (method + path) ─────────────────────────────────── */
+
+.api-endpoint-meta {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  padding: 0.625rem 0.875rem;
+  background: var(--w-code-bg);
+  border: 1px solid var(--w-border);
+  border-radius: 8px;
+  margin: 0 0 1.75rem !important;
+  flex-wrap: wrap !important;
+}
+
+.api-method {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase !important;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px !important;
+  color: #ffffff;
+  line-height: 1 !important;
+  flex-shrink: 0;
+  border: none !important;
+}
+
+.api-method-get    { background: var(--w-method-get) !important; }
+.api-method-post   { background: var(--w-method-post) !important; }
+.api-method-put    { background: var(--w-method-put) !important; }
+.api-method-patch  { background: var(--w-method-patch) !important; }
+.api-method-delete { background: var(--w-method-delete) !important; }
+
+.api-endpoint-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--w-text-strong) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  word-break: break-all;
+}
+
+.api-endpoint-tag {
+  font-size: 0.6875rem !important;
+  font-weight: 500 !important;
+  background: var(--w-border-soft) !important;
+  color: var(--w-text-soft) !important;
+  padding: 0.1875rem 0.5rem !important;
+  border-radius: 999px !important;
+  text-transform: capitalize;
+  border: none !important;
+}
+
+.api-endpoint-tag + .api-endpoint-tag,
+.api-endpoint-meta > .api-endpoint-tag:first-of-type { margin-left: auto; }
+.api-endpoint-meta > .api-endpoint-tag + .api-endpoint-tag { margin-left: 0; }
+
+.api-endpoint-deprecated {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--w-method-delete) 12%, transparent);
+  color: var(--w-method-delete);
+  border: 1px solid color-mix(in srgb, var(--w-method-delete) 30%, transparent);
+  padding: 0.1875rem 0.5rem;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Combined endpoint bar: meta row + Try-it accordion. The header keeps the
+   same chrome as the standalone .api-endpoint-meta; when expanded, the
+   accordion panel inherits the bar's frame, no separate card needed. */
+.api-endpoint-bar {
+  background: var(--w-code-bg);
+  border: 1px solid var(--w-border);
+  border-radius: 8px;
+  margin: 0 0 1.75rem;
+  overflow: hidden;
+}
+
+.api-endpoint-bar-header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  flex-wrap: wrap;
+}
+
+.api-endpoint-tryit-toggle {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--w-text-strong);
+  background: var(--w-bg);
+  border: 1px solid var(--w-border);
+  border-radius: 0.375rem;
+  padding: 0.3125rem 0.625rem;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.api-endpoint-tryit-toggle:hover {
+  background: var(--w-border-soft);
+  border-color: var(--w-accent-border);
+}
+
+.api-endpoint-tryit-chevron {
+  transition: transform 0.15s;
+  color: var(--w-text-soft);
+}
+
+.api-endpoint-bar[data-open="true"] .api-endpoint-tryit-chevron {
+  transform: rotate(180deg);
+}
+
+.api-endpoint-bar[data-open="true"] .api-endpoint-tryit-toggle {
+  background: var(--w-accent-soft);
+  border-color: var(--w-accent-border);
+  color: var(--w-accent);
+}
+
+.api-endpoint-tryit-panel {
+  border-top: 1px solid var(--w-border);
+  background: var(--w-bg);
+}
+
+/* Strip the .api-tryit card's outer chrome when it's rendered inside the
+   accordion — the bar's frame already provides one. */
+.api-endpoint-tryit-panel .api-tryit {
+  border: none;
+  border-radius: 0;
+  margin: 0;
+  background: transparent;
+}
+
+/* The TryIt component shows its own method/path header; hide it here since
+   the bar's header already shows that info. */
+.api-endpoint-tryit-panel .api-tryit-header {
+  display: none;
+}
+
+/* ── Parameters table ─────────────────────────────────────────────────── */
+
+.api-param-section { margin: 0 0 1.5rem !important; }
+
+.api-param-section-title {
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em;
+  color: var(--w-text-soft) !important;
+  margin: 0 0 0.5rem !important;
+}
+
+.api-param-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  border: 1px solid var(--w-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.api-param-table thead { background: var(--w-border-soft); }
+
+.api-param-table th {
+  text-align: left;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--w-text-soft);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--w-border);
+}
+
+.api-param-table td {
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--w-border-soft);
+  vertical-align: top;
+  color: var(--w-text);
+  line-height: 1.5;
+}
+
+.api-param-table tr:last-child td { border-bottom: none; }
+
+.api-param-table td code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--w-text-strong);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+/* ── Schema tree ──────────────────────────────────────────────────────── */
+
+.api-schema-block {
+  border: 1px solid var(--w-border) !important;
+  border-radius: 8px !important;
+  padding: 0.25rem 0.875rem !important;
+  background: var(--w-bg) !important;
+  margin-bottom: 1rem !important;
+}
+
+.api-schema-root,
+.api-schema-children {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.api-schema-row {
+  padding: 0.5rem 0 !important;
+  border-bottom: 1px solid var(--w-border-soft) !important;
+}
+
+.api-schema-row:last-child { border-bottom: none !important; }
+
+.api-schema-row-head {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.5rem !important;
+  font-size: 0.875rem;
+}
+
+.api-schema-toggle {
+  width: 18px !important;
+  height: 18px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid var(--w-border) !important;
+  background: var(--w-bg) !important;
+  border-radius: 4px !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem !important;
+  font-weight: 600;
+  color: var(--w-text-soft) !important;
+  cursor: pointer !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  flex-shrink: 0 !important;
+}
+
+.api-schema-toggle:hover {
+  background: var(--w-hover-bg) !important;
+  color: var(--w-text-strong) !important;
+  border-color: var(--w-text-faint) !important;
+}
+
+.api-schema-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--w-text-strong) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+.api-schema-type {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.75rem !important;
+  color: var(--w-accent) !important;
+  font-weight: 500;
+}
+
+.api-schema-required {
+  font-size: 0.625rem !important;
+  font-weight: 700 !important;
+  color: var(--w-method-delete) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em;
+}
+
+.api-schema-description {
+  margin-top: 0.25rem !important;
+  padding-left: 26px;
+  font-size: 0.8125rem !important;
+  color: var(--w-text-soft) !important;
+  line-height: 1.55 !important;
+}
+
+/* ── Response block ───────────────────────────────────────────────────── */
+
+.api-response-block { margin: 0 0 1.25rem !important; }
+
+.api-response-header {
+  display: flex !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 0.625rem !important;
+  margin: 0 0 0.625rem !important;
+}
+
+.api-response-status {
+  display: inline-flex !important;
+  align-items: center !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  color: #ffffff !important;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.api-status-2xx     { background: var(--w-status-2xx) !important; }
+.api-status-3xx     { background: var(--w-status-3xx) !important; }
+.api-status-4xx     { background: var(--w-status-4xx) !important; }
+.api-status-5xx     { background: var(--w-status-5xx) !important; }
+.api-status-default { background: var(--w-text-faint) !important; }
+
+/* Response tabs (main column): uses the global [role="tablist"] /
+   [role="tab"] styling — same card pattern as Nextra tabs — with a
+   color-coded status dot inside each tab button. */
+.api-response-tabs [role="tab"] {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4375rem !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+}
+
+.api-response-tab-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.api-response-panel-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin: 0 0 0.875rem;
+  font-size: 0.875rem;
+  color: var(--w-text);
+}
+
+.api-response-panel-meta .api-response-contenttype {
+  margin-left: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  color: var(--w-text-faint);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.api-response-description {
+  color: var(--w-text);
+  font-size: 0.875rem;
+}
+
+.api-response-contenttype {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  color: var(--w-text-faint) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-left: auto;
+}
+
+/* ── Auth requirements ────────────────────────────────────────────────── */
+
+.api-auth-none {
+  color: var(--w-text-soft) !important;
+  font-style: italic;
+  font-size: 0.875rem !important;
+  margin: 0 0 1rem !important;
+}
+
+.api-auth-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.api-auth-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--w-border);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.api-auth-item:last-child { margin-bottom: 0; }
+
+.api-auth-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--w-text-strong);
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.api-auth-description { color: var(--w-text-soft); }
+
+.api-auth-scopes {
+  font-size: 0.75rem;
+  color: var(--w-text-faint);
+  margin-left: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ── Code switcher (request / response samples) ─────────────────────────
+   Modelled on the existing .nextra-code "filename header + pre" card so
+   API code samples look like every other code block in the docs:
+     • toolbar = top half (filename-header-bg, rounded TOP only)
+     • body    = bottom half (code-bg, rounded BOTTOM only)
+     • border-radius matches the .nextra-code convention (0.625rem)
+   Inner Nextra code chrome (its own border/radius/buttons) is neutralised
+   so the switcher's outer frame is the only one visible. */
+
+.api-code-switcher {
+  margin: 0 0 1rem !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.api-code-switcher-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+  background: var(--w-filename-header-bg) !important;
+  border: 1px solid var(--w-border) !important;
+  border-bottom: none !important;
+  border-radius: 0.625rem 0.625rem 0 0 !important;
+  color: var(--w-text-soft) !important;
+  height: auto !important;
+}
+
+.api-code-switcher-label {
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  color: var(--w-text-soft) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  flex-shrink: 0;
+}
+
+/* Pill-shaped dropdown trigger: terminal icon prefix + label + up/down chevron.
+   Wrapper provides the visual chrome; the underlying <select> is transparent
+   and fills the wrapper so a click anywhere opens the native menu. */
+.api-code-switcher-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: var(--w-bg);
+  border: 1px solid var(--w-border);
+  border-radius: 0.375rem;
+  padding: 0 0.625rem 0 0.5rem;
+  margin-left: auto;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.api-code-switcher-select-wrap:hover {
+  border-color: var(--w-text-faint);
+}
+
+.api-code-switcher-select-wrap:focus-within {
+  border-color: var(--w-accent);
+  box-shadow: 0 0 0 2px var(--w-accent-soft);
+}
+
+.api-code-switcher-select-icon {
+  color: var(--w-text);
+  pointer-events: none;
+  flex-shrink: 0;
+  margin-right: 0.375rem;
+}
+
+.api-code-switcher-select-chevron {
+  color: var(--w-text-soft);
+  pointer-events: none;
+  flex-shrink: 0;
+  margin-left: 0.25rem;
+}
+
+.api-code-switcher-select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  margin: 0;
+  padding: 0.3125rem 0 !important;
+  font-family: inherit !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--w-text-strong) !important;
+  cursor: pointer;
+}
+
+/* Response variant: inline tabs in the toolbar replace the dropdown, and the
+   selected status code's description is rendered as a sub-header strip between
+   the toolbar and the code body. */
+.api-code-switcher-tablist {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  margin-left: auto;
+}
+
+/* Mirrors the [role="tab"] styling in this file so the response tabs read
+   the same as Nextra tabs (soft text, accent on selected, subtle lift). */
+.api-code-switcher-tab {
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--w-text-soft);
+  background: none;
+  border: none;
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.api-code-switcher-tab:hover {
+  color: var(--w-text-strong);
+  background: var(--w-hover-bg);
+}
+
+.api-code-switcher-tab[aria-pressed="true"] {
+  background: var(--w-bg);
+  color: var(--w-accent);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.dark .api-code-switcher-tab[aria-pressed="true"] {
+  background: var(--w-bg);
+  box-shadow: none;
+}
+
+.api-code-switcher-subheader {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  color: var(--w-text-soft);
+  background: var(--w-filename-header-bg);
+  border-left: 1px solid var(--w-border);
+  border-right: 1px solid var(--w-border);
+  border-bottom: 1px solid var(--w-border);
+}
+
+/* Copy button — same dimensions and styling as .nextra-code button[title="Copy code"]
+   so the request/response switcher's copy affordance is visually identical to
+   the per-block copy button used in standalone code blocks. Icon-only. */
+.api-code-switcher-copy {
+  background: var(--w-bg) !important;
+  color: var(--w-text-soft) !important;
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.375rem !important;
+  padding: 0.3125rem !important;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  flex-shrink: 0 !important;
+  transition: background 0.12s, color 0.12s, border-color 0.12s !important;
+  /* Reset inherited ::before from components.mjs */
+  position: static !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+}
+
+.api-code-switcher-copy::before {
+  content: none !important;
+}
+
+.api-code-switcher-copy:hover {
+  background: var(--w-border-soft) !important;
+  color: var(--w-text-strong) !important;
+  border-color: var(--w-accent-border) !important;
+}
+
+.dark .api-code-switcher-copy {
+  background: var(--w-border-soft) !important;
+  border-color: var(--w-border) !important;
+}
+
+.dark .api-code-switcher-copy:hover {
+  background: var(--w-hover-bg) !important;
+  color: var(--w-text-strong) !important;
+}
+
+.api-code-switcher-copy[data-copied="true"],
+.dark .api-code-switcher-copy[data-copied="true"] {
+  color: var(--w-method-post) !important;
+  border-color: var(--w-method-post) !important;
+  background: color-mix(in srgb, var(--w-method-post) 10%, transparent) !important;
+}
+
+.api-code-switcher-body {
+  background: var(--w-code-bg);
+  border: 1px solid var(--w-border);
+  border-top: none;
+  border-radius: 0 0 0.625rem 0.625rem;
+  box-shadow: var(--w-code-shadow);
+}
+
+/* Neutralise the inner Nextra code-block chrome; the body provides the frame.
+   The \`.nextra-code\` rules elsewhere in this file would otherwise add their
+   own border, radius, shadow, and background on top of ours. */
+.api-code-switcher-pane,
+.api-code-switcher-pane > div {
+  margin: 0;
+  padding: 0;
+}
+
+.api-code-switcher-pane .nextra-code {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+.api-code-switcher-pane .nextra-code > div:first-child {
+  display: none !important;
+}
+
+.api-code-switcher-pane pre,
+.api-code-switcher-pane .nextra-code pre {
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  /* Match the tab-panel code padding so request/response samples have the
+     same breathing room as the in-content code blocks shown in tabs. */
+  padding: 1rem !important;
+}
+
+/* The toolbar already exposes a single Copy button driven by the switcher,
+   so per-block copy/word-wrap buttons inside each pane are redundant. */
+.api-code-switcher-pane .nextra-code button[title="Copy code"],
+.api-code-switcher-pane .nextra-code button[title="Toggle word wrap"] {
+  display: none !important;
+}
+
+/* ── Try-it interactive form ──────────────────────────────────────────── */
+
+.api-tryit {
+  border: 1px solid var(--w-border) !important;
+  border-radius: 8px !important;
+  padding: 1rem 1.125rem 1.125rem !important;
+  background: var(--w-bg) !important;
+  margin: 0 0 1.5rem !important;
+  display: block !important;
+  gap: 0 !important;
+  box-shadow: none !important;
+}
+
+.api-tryit-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  margin: 0 0 1rem !important;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--w-border-soft);
+  flex-wrap: wrap !important;
+}
+
+.api-tryit-path {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--w-text-strong) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  word-break: break-all;
+  border-radius: 0 !important;
+}
+
+.api-tryit-section {
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 0 0.875rem !important;
+  display: block !important;
+  gap: 0 !important;
+}
+
+.api-tryit-field {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.3125rem !important;
+  margin: 0 0 0.75rem !important;
+}
+
+.api-tryit-field:last-child { margin-bottom: 0 !important; }
+
+.api-tryit-label {
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  color: var(--w-text-soft) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+}
+
+.api-tryit-hint {
+  font-weight: 400 !important;
+  color: var(--w-text-faint) !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 0.6875rem !important;
+  margin-left: 0 !important;
+}
+
+.api-tryit-input,
+.api-tryit-textarea {
+  width: 100% !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.8125rem !important;
+  padding: 0.4375rem 0.625rem !important;
+  background: var(--w-bg) !important;
+  border: 1px solid var(--w-border) !important;
+  border-radius: 6px !important;
+  color: var(--w-text-strong) !important;
+  line-height: 1.45;
+  font: unset !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-size: 0.8125rem !important;
+}
+
+.api-tryit-textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.api-tryit-input:focus,
+.api-tryit-textarea:focus {
+  outline: none !important;
+  border-color: var(--w-accent) !important;
+  box-shadow: 0 0 0 3px var(--w-accent-soft) !important;
+}
+
+.api-tryit-send {
+  background: var(--w-accent) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 0.5rem 1.125rem !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  cursor: pointer;
+  font-family: inherit !important;
+  transition: opacity 0.12s, transform 0.06s !important;
+  filter: none !important;
+  align-self: auto !important;
+}
+
+.api-tryit-send:hover  { opacity: 0.9 !important; }
+.api-tryit-send:active { transform: translateY(1px); }
+
+.api-tryit-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.api-tryit-error {
+  background: color-mix(in srgb, var(--w-method-delete) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--w-method-delete) 30%, transparent);
+  color: var(--w-text-strong);
+  padding: 0.625rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  margin: 1rem 0 0;
+}
+
+.api-tryit-response {
+  margin: 1rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--w-border-soft);
+}
+
+.api-tryit-response-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--w-text);
+}
+
+.api-tryit-response-headers {
+  font-size: 0.8125rem;
+  margin: 0 0 0.75rem;
+  color: var(--w-text-soft);
+}
+
+.api-tryit-response-headers summary {
+  cursor: pointer;
+  color: var(--w-text-soft);
+  font-weight: 500;
+}
+
+.api-tryit-response-headers summary:hover { color: var(--w-text-strong); }
+
+.api-tryit-response-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 0.5rem;
+}
+
+.api-tryit-response-label {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--w-text-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.api-tryit-response-body {
+  background: var(--w-code-bg);
+  border: 1px solid var(--w-border);
+  border-radius: 6px;
+  padding: 0.75rem 0.875rem;
+  font-size: 0.8125rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  max-height: 24rem;
+  overflow: auto;
+  margin: 0;
+  color: var(--w-text);
+  line-height: 1.55;
+}
+
+/* ── Sidebar method pills ──────────────────────────────────────────────
+   API endpoint sidebar items get a small color-coded HTTP method pill
+   prefixed via ::before. Method is inferred from the operation_id prefix
+   in the href (e.g. \`get_pipeline\`, \`list_pipelines\`, \`post_pipeline\`).
+   Operations whose names don't start with a method (\`checkpoint_\`,
+   \`commit_\`, \`http_input\`, \`start_transaction\`, etc.) are listed
+   explicitly in the matched-ops selector and the per-method content rules. */
+
+/* The set of API hrefs that get a pill. Extend both this group and the
+   matching per-method content block below when adding new endpoints. */
+:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
+  [href*="/get_"], [href*="/list_"], [href*="/post_"], [href*="/put_"],
+  [href*="/patch_"], [href*="/delete_"],
+  [href$="/checkpoint_pipeline"], [href$="/commit_transaction"],
+  [href$="/completion_status"], [href$="/completion_token"],
+  [href$="/http_input"], [href$="/http_output"],
+  [href$="/pipeline_adhoc_sql"], [href$="/reset_status"],
+  [href$="/start_samply_profile"], [href$="/start_transaction"],
+  [href$="/sync_checkpoint"]
+) {
+  display: flex !important;
+  align-items: center !important;
+}
+
+:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
+  [href*="/get_"], [href*="/list_"], [href*="/post_"], [href*="/put_"],
+  [href*="/patch_"], [href*="/delete_"],
+  [href$="/checkpoint_pipeline"], [href$="/commit_transaction"],
+  [href$="/completion_status"], [href$="/completion_token"],
+  [href$="/http_input"], [href$="/http_output"],
+  [href$="/pipeline_adhoc_sql"], [href$="/reset_status"],
+  [href$="/start_samply_profile"], [href$="/start_transaction"],
+  [href$="/sync_checkpoint"]
+)::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  border-radius: 4px;
+  padding: 0.1875rem 0.4375rem;
+  margin-right: 0.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Per-method content + colour. Both the prefix-based and explicit op
+   selectors are listed here so the right pill renders for each href. */
+:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
+  [href*="/get_"], [href*="/list_"],
+  [href$="/completion_status"], [href$="/completion_token"],
+  [href$="/pipeline_adhoc_sql"], [href$="/reset_status"]
+)::before {
+  content: "GET";
+  background: var(--w-method-get);
+}
+
+:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"]:is(
+  [href*="/post_"],
+  [href$="/checkpoint_pipeline"], [href$="/commit_transaction"],
+  [href$="/http_input"], [href$="/http_output"],
+  [href$="/start_samply_profile"], [href$="/start_transaction"],
+  [href$="/sync_checkpoint"]
+)::before {
+  content: "POST";
+  background: var(--w-method-post);
+}
+
+:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"][href*="/put_"]::before {
+  content: "PUT";
+  background: var(--w-method-put);
+}
+
+:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"][href*="/patch_"]::before {
+  content: "PATCH";
+  background: var(--w-method-patch);
+}
+
+:is(.nextra-sidebar, .nextra-mobile-nav) a[href*="/api-openapi/"][href*="/delete_"]::before {
+  content: "DELETE";
+  background: var(--w-method-delete);
+}
+
+/* ── API reference page layout (theme-portable) ────────────────────────
+   Repositions the samples aside into the outer grid's TOC slot (col 4) so
+   article width and footer alignment stay unchanged on API pages. Relies on:
+     • Each theme's outer grid having article in col 3, TOC in col 4
+     • Each theme defining \`--w-grid-cols-api\` (its outer grid template with
+       col 4 widened for API pages)
+     • API pages setting \`toc: false\` in MDX frontmatter, so col 4 is unused
+   Below 1280px the outer grid collapses (theme-side), and the inner endpoint
+   grid stacks via the rule further down. */
+
+@media (min-width: 1280px) {
+  /* Swap the outer grid template to the API variant when the page contains
+     an .api-endpoint-grid. The footer's separate grid wrapper gets the same
+     swap so its col-3 children stay aligned with the article column. */
+  div:has(> aside.nextra-sidebar):has(.api-endpoint-grid) {
+    grid-template-columns: var(--w-grid-cols-api) !important;
+  }
+  body:has(.api-endpoint-grid) > div:has(> footer) {
+    grid-template-columns: var(--w-grid-cols-api) !important;
+  }
+
+  /* Article subgrid: claim cols 3-4 and pass them through so descendants
+     can place themselves into the article or the samples aside slot. */
+  article:has(.api-endpoint-grid) {
+    grid-column: 3 / span 2 !important;
+    max-width: none !important;
+    display: grid !important;
+    grid-template-columns: subgrid !important;
+    grid-auto-rows: auto;
+    column-gap: 0 !important;
+  }
+
+  /* By default every direct article child stays in col 1 (article width). */
+  article:has(.api-endpoint-grid) > * {
+    grid-column: 1 !important;
+    min-width: 0;
+  }
+
+  /* Nextra wraps MDX content in <main>; thread the subgrid through it so
+     .api-endpoint-grid inside can still reach the TOC slot. */
+  article:has(.api-endpoint-grid) > main {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: subgrid !important;
+    gap: 0 !important;
+  }
+  article:has(.api-endpoint-grid) > main > * {
+    grid-column: 1 !important;
+    min-width: 0;
+  }
+
+  /* The endpoint grid itself: place .api-endpoint-main in col 1 (article),
+     .api-endpoint-aside in col 2 (TOC slot). */
+  article:has(.api-endpoint-grid) > main > .api-endpoint-grid {
+    grid-column: 1 / -1 !important;
+    display: grid !important;
+    grid-template-columns: subgrid !important;
+    gap: 0 !important;
+  }
+  article:has(.api-endpoint-grid) > main > .api-endpoint-grid > .api-endpoint-main {
+    grid-column: 1 !important;
+    min-width: 0;
+  }
+  article:has(.api-endpoint-grid) > main > .api-endpoint-grid > .api-endpoint-aside {
+    grid-column: 2 !important;
+    min-width: 0;
+    padding-left: 2rem;
+  }
+}
+
+/* ── Responsive: stack the inner endpoint grid on narrow screens ──────── */
+
+/* Matches the breakpoint where each theme's outer TOC column disappears. */
+@media (max-width: 1279px) {
+  .api-endpoint-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+  .api-endpoint-aside {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLUX MOBILE — responsive overrides for flux-specific selectors
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  /* Prev/next pagination stacks so each card is full-width and tappable. */
+  article > div.nextra-border:has(> a) {
+    flex-direction: column !important;
+  }
+  article > div.nextra-border:has(> a) > a:last-child {
+    justify-content: flex-start !important;
+    text-align: start !important;
+  }
+
+  /* Footer with columns: stack brand block above the link grid; reduce padding. */
+  footer.flux-footer      { padding: 0 1.25rem 2rem !important; }
+  footer.flux-footer > .w-footer-powered { padding-right: 0 !important; align-self: flex-start !important; }
+}
 `;
 
 export function buildCss() {
-	return CSS;
+	return COMPONENTS_CSS + "\n" + FLUX_THEME_CSS;
 }

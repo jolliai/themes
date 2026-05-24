@@ -1,47 +1,88 @@
 /**
- * Jolli theme CSS — base stylesheet.
+ * Jollia theme CSS.
+ *
+ * Emits the shared component styles from ./components.mjs followed by
+ * Jollia-specific design tokens and theme-prefixed layout selectors.
  */
 
-const CSS = `
+import COMPONENTS_CSS from "./components.mjs";
+
+const JOLLIA_THEME_CSS = `/*
+ * Jollia Theme — design tokens and layout selectors.
+ * Shared component styles live in ./components.mjs (prepended above).
+ */
+
 /* ═══════════════════════════════════════════════════════════
-   Jolli Theme — The official Jolli documentation theme
+   Jollia Theme — The official Jolli documentation theme
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Design tokens ────────────────────────────────────────── */
 :root {
-  --jolli-green: #0D9373;
-  --jolli-green-light: #0fb98d;
-  --jolli-green-soft: #ecfdf5;
-  --jolli-green-border: #6ee7b7;
-  --jolli-bg: #ffffff;
-  --jolli-bg-surface: #f9fafb;
-  --jolli-text: #1f2937;
-  --jolli-text-soft: #6b7280;
-  --jolli-text-faint: #9ca3af;
-  --jolli-border: #e5e7eb;
-
+  /* Nextra internals */
   --nextra-primary-hue: 158;
   --nextra-primary-saturation: 82%;
   --nextra-primary-lightness: 32%;
-}
-.dark {
-  --jolli-green: #34d399;
-  --jolli-green-light: #6ee7b7;
-  --jolli-green-soft: #064e3b;
-  --jolli-green-border: #065f46;
-  --jolli-bg: #111827;
-  --jolli-bg-surface: #1f2937;
-  --jolli-text: #f3f4f6;
-  --jolli-text-soft: #9ca3af;
-  --jolli-text-faint: #6b7280;
-  --jolli-border: #374151;
+  --nextra-navbar-height: 104px;
 
+  /* ── Accent ─────────────────────────────────────────── */
+  --w-accent:        #0D9373;
+  --w-accent-soft:   #ecfdf5;
+  --w-accent-border: #6ee7b7;
+
+  /* ── General palette ────────────────────────────────── */
+  --w-bg:            #ffffff;
+  --w-border:        #e5e7eb;
+  --w-border-soft:   #f3f4f6;
+  --w-text-strong:   #1f2937;
+  --w-text:          #374151;
+  --w-text-soft:     #6b7280;
+  --w-text-faint:    #9ca3af;
+  --w-hover-bg:      #f9fafb;
+
+  /* ── Component colour tokens ────────────────────────── */
+  --w-code-bg:             #f8fafc;
+  --w-code-shadow:         0 1px 3px rgba(0,0,0,0.04);
+  --w-filename-header-bg:  #f3f4f6;
+  --w-inline-code-color:   #0a7d62;
+  --w-inline-code-bg:      #ecfdf5;
+  --w-inline-code-border:  #d1fae5;
+  --w-card-bg:             #f9fafb;
+  --w-scrollbar-thumb:     #d1d5db;
+  --w-font-family:         'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.dark {
   --nextra-primary-lightness: 60%;
+
+  /* ── Accent ─────────────────────────────────────────── */
+  --w-accent:        #34d399;
+  --w-accent-soft:   #064e3b;
+  --w-accent-border: #065f46;
+
+  /* ── General palette ────────────────────────────────── */
+  --w-bg:            #111827;
+  --w-border:        #374151;
+  --w-border-soft:   #1f2937;
+  --w-text-strong:   #f9fafb;
+  --w-text:          #d1d5db;
+  --w-text-soft:     #9ca3af;
+  --w-text-faint:    #6b7280;
+  --w-hover-bg:      #1e2535;
+
+  /* ── Component colour tokens ────────────────────────── */
+  --w-code-bg:             #1a2332;
+  --w-code-shadow:         none;
+  --w-filename-header-bg:  #1f2937;
+  --w-inline-code-color:   #6ee7b7;
+  --w-inline-code-bg:      #064e3b;
+  --w-inline-code-border:  #065f46;
+  --w-card-bg:             #1f2937;
+  --w-scrollbar-thumb:     #4b5563;
 }
 
 /* ── Base ─────────────────────────────────────────────────── */
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  font-family: var(--w-font-family) !important;
 }
 
 /* ── Navbar ───────────────────────────────────────────────── */
@@ -76,9 +117,6 @@ body {
 }
 
 /* Navbar height for the second row */
-:root {
-  --nextra-navbar-height: 104px;
-}
 .nextra-navbar {
   height: auto !important;
   min-height: 104px;
@@ -92,7 +130,7 @@ body {
   padding: 0.625rem 1rem !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
-  color: var(--jolli-text-soft) !important;
+  color: var(--w-text-soft) !important;
   border-bottom: 2px solid transparent !important;
   cursor: pointer !important;
   transition: color 0.15s, border-color 0.15s !important;
@@ -101,34 +139,28 @@ body {
   padding-left: 0 !important;
 }
 .nextra-scrollbar:has(> a[href]) > a:hover {
-  color: var(--jolli-text) !important;
+  color: var(--w-text-strong) !important;
 }
 
 /* Active tab */
 .nextra-scrollbar:has(> a[href]) > a[aria-current] {
-  color: var(--jolli-green) !important;
-  border-bottom-color: var(--jolli-green) !important;
+  color: var(--w-accent) !important;
+  border-bottom-color: var(--w-accent) !important;
   font-weight: 600 !important;
 }
 
 /* ── Sidebar ─────────────────────────────────────────────── */
 aside.nextra-sidebar a:hover {
-  color: var(--jolli-green) !important;
+  color: var(--w-accent) !important;
 }
 aside.nextra-sidebar li.active > a {
-  color: var(--jolli-green) !important;
+  color: var(--w-accent) !important;
   font-weight: 600 !important;
 }
 
 /* ── Links ────────────────────────────────────────────────── */
 a:hover {
-  color: var(--jolli-green);
-}
-
-/* ── Code blocks ─────────────────────────────────────────── */
-pre {
-  border: 1px solid var(--jolli-border) !important;
-  border-radius: 0.5rem !important;
+  color: var(--w-accent);
 }
 
 /* Hidden SidebarTabs — only for root URL redirect */
@@ -152,6 +184,6 @@ pre {
 }
 `;
 
-export function buildCss() {
-	return CSS;
+export function buildCss(config) {
+	return COMPONENTS_CSS + "\n" + JOLLIA_THEME_CSS;
 }

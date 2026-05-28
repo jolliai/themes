@@ -313,10 +313,92 @@ body { background-color: var(--w-bg); }
   background: var(--w-border-soft) !important;
 }
 
-/* Push sidebar scroll area below the pinned logo + search */
+/* Push the sidebar scroll area below the pinned logo + search. Use margin (not
+   padding) so the scroll BOX itself — and therefore its scrollbar — begins below
+   the pinned header, instead of running full-height up behind the logo/search.
+   The div's own p-4 then gives the first nav item a clean gap under the search.
+   It's a flex grow child, so the margin correctly reduces its height. */
 .nextra-sidebar > div:first-child {
-  padding-top: calc(var(--nextra-navbar-height) + 3.75rem) !important;
-  scrollbar-gutter: auto !important;
+  /* Clears the pinned logo (navbar-height) + the pinned search box below it.
+     3.5rem is sized to the search box's height with only a hair of slack, so the
+     first nav item sits snug under the search without slipping behind it. */
+  margin-top: calc(var(--nextra-navbar-height) + 3.5rem) !important;
+  /* Trim the scroll area's default p-4 top padding so the first nav item sits
+     closer under the search. */
+  padding-top: 0.375rem !important;
+  /* Nudge the nav item highlight to line its left/right edges up with the search
+     bar above: a touch more left padding, and less right padding (the reserved
+     scrollbar lane already adds to the right inset). */
+  padding-left: 1.1rem !important;
+  padding-right: 0.4rem !important;
+}
+
+/* Top-level nav list spacing — across all pages the top-level rows (leaves and
+   groups alike) read tighter than the nested lists. Add row-gap to the top-level
+   list only. It sits directly in the scroll area (or one wrapper div in), never
+   inside an li, so ul:not(li ul) targets it without touching nested lists. */
+.nextra-sidebar > div:first-child ul:not(li ul) {
+  row-gap: 0.25rem !important; /* match the nested lists' gap-1 */
+}
+
+/* Gap between a folder header and its first nested item — only when the folder
+   is open (Nextra adds .open to the li). When closed, the collapsible wrapper
+   below is 0 height, so this margin would just inflate the gap to the next group. */
+.nextra-sidebar li.open > a:first-child,
+.nextra-sidebar li.open > button:first-child {
+  margin-bottom: 0.25rem !important;
+}
+
+/* Trim the gap below a sidebar section separator (a li with no link/button/ul
+   inside — just heading text/span). Nextra's default bottom spacing reads a bit
+   loose under the separator; pull it in to ~75% of current. */
+.nextra-sidebar li:not(:has(a)):not(:has(button)):not(:has(ul)) {
+  margin-bottom: 0.125rem !important; /* ~50% of Nextra's default mb-2 (0.5rem) */
+}
+
+/* Sidebar scrollbar — thin, no track background, just the thumb. */
+.nextra-sidebar > div:first-child {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--w-scrollbar-thumb) transparent !important;
+}
+.nextra-sidebar > div:first-child::-webkit-scrollbar { width: 4px !important; height: 4px !important; }
+.nextra-sidebar > div:first-child::-webkit-scrollbar-track { background: transparent !important; }
+.nextra-sidebar > div:first-child::-webkit-scrollbar-thumb {
+  background: var(--w-scrollbar-thumb) !important;
+  border-radius: 999px !important;
+}
+
+/* Sidebar scroll fade. Nextra's .nextra-mask statically fades BOTH the top and
+   bottom 20px of the scroll area — but the top is anchored by the pinned search,
+   so a fade there only dims the first item and reads as extra padding. Default
+   to fading the bottom edge only (single-layer gradient, crisp top); then, where
+   scroll-driven animations are supported, fade the top edge in over the first
+   20px of scroll so it appears only once there's content scrolled above. Browsers
+   without scroll timelines keep the crisp-top fallback. */
+/* NOTE: no !important here — important author declarations outrank CSS
+   animations in the cascade, so it would block the scroll-driven keyframes
+   below. The selector's specificity (0,3,1) already beats Nextra's .nextra-mask
+   (0,1,0), so the base fade still wins without it. */
+.nextra-sidebar > div:first-child.nextra-mask {
+  -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+          mask-image: linear-gradient(to bottom, #000 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+}
+@supports (animation-timeline: scroll()) {
+  .nextra-sidebar > div:first-child.nextra-mask {
+    animation: forge-sidebar-scroll-fade linear both;
+    animation-timeline: scroll(self);
+    animation-range: 0 20px;
+  }
+}
+@keyframes forge-sidebar-scroll-fade {
+  from {
+    -webkit-mask-image: linear-gradient(to bottom, #000 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+            mask-image: linear-gradient(to bottom, #000 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+  }
+  to {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);
+  }
 }
 
 /* Portaled dropdowns (search results, navbar Menu, ThemeSwitch Select).

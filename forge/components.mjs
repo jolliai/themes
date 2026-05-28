@@ -1009,6 +1009,13 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
     margin-right: auto !important;
     align-self: flex-start !important;
   }
+  /* The rule above left-aligns every footer child to sit under the main column,
+     but the "Built with Jolli" link should stay on the right (as on other
+     pages). It keeps the 840px width cap, so right-aligning its text lands it on
+     the right edge of the footer columns above it. */
+  body:has(article .api-endpoint-grid) > div:has(> footer) > footer.forge-footer > .w-footer-powered {
+    text-align: right !important;
+  }
 }
 
 /* Header strip — matches the filename header above a .nextra-code block:
@@ -1023,7 +1030,10 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
   align-items: center !important;
   gap: 0.5rem !important;
   height: 3rem !important;
-  padding: 0 1rem !important;
+  /* Right padding tightened to 0.5rem so the toolbar copy button lines up in
+     the same vertical column as the floating .api-cb-wrap (right: 0.5rem) in
+     the body below it. Left stays 1rem for the label/tabs. */
+  padding: 0 0.5rem 0 1rem !important;
 }
 
 .api-code-switcher-label {
@@ -1036,24 +1046,88 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
 
 /* Language-select dropdown — chip-style text control. */
 .api-code-switcher-select {
-  background: var(--w-bg) !important;
+  /* Custom chevron (native one can't be inset) — uses background-color, not the
+     background shorthand, so the chevron image survives the hover/dark rules. */
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-color: var(--w-bg) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23687076' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.5rem center !important;
+  background-size: 0.75rem !important;
   border: 1px solid var(--w-border) !important;
   border-radius: 0.375rem !important;
   color: var(--w-text-soft) !important;
   font-family: inherit !important;
   font-size: 0.75rem !important;
-  padding: 0.25rem 0.5rem !important;
-  transition: background 0.12s, color 0.12s, border-color 0.12s !important;
+  /* Extra right padding for the chevron; min-width so longer labels
+     ("TypeScript") clear the arrow instead of crowding it. */
+  padding: 0.25rem 1.625rem 0.25rem 0.5rem !important;
+  min-width: 7rem !important;
+  transition: background-color 0.12s, color 0.12s, border-color 0.12s !important;
 }
 .api-code-switcher-select:hover,
 .api-code-switcher-select:focus {
-  background: var(--w-border-soft) !important;
+  background-color: var(--w-border-soft) !important;
   border-color: var(--w-accent-border) !important;
   color: var(--w-text-strong) !important;
   outline: none !important;
 }
 .dark .api-code-switcher-select {
-  background: var(--w-border-soft) !important;
+  background-color: var(--w-border-soft) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ba1a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+}
+
+/* Response status tabs — plain-text status codes that live inside the header
+   strip (not boxed chips). The active code is simply bolder + full-contrast;
+   the rest are faint. No fill, border, radius, or focus ring, so the row reads
+   as part of the header rather than a set of buttons. The :has() rule lets the
+   "Response" label sit left while the tab row pushes the copy button right. */
+.api-code-switcher-toolbar:has(.api-code-switcher-tabs) .api-code-switcher-label {
+  margin-right: 0 !important;
+}
+.api-code-switcher-tabs {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  margin-right: auto !important;
+}
+.api-code-switcher-tab {
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  line-height: 1 !important;
+  color: var(--w-text-soft) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0.375rem !important;
+  padding: 0.3125rem 0.5rem !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: color 0.12s, background 0.12s !important;
+}
+.api-code-switcher-tab:hover {
+  color: var(--w-text-strong) !important;
+  background: var(--w-hover-bg) !important;
+}
+/* Selected tab — lifts off the header as a raised chip: page-surface fill, a
+   hairline ring, and the theme's soft shadow for a little depth. */
+.api-code-switcher-tab[data-active="true"] {
+  color: var(--w-text-strong) !important;
+  font-weight: 700 !important;
+  background: var(--w-bg) !important;
+  box-shadow: 0 0 0 1px var(--w-border), var(--w-code-shadow) !important;
+}
+
+/* Status description — a sub-header band: same fill as the toolbar above it
+   (--w-filename-header-bg) with its own bottom divider, so it reads as a
+   second header row sitting between the status tabs and the code body. */
+.api-code-switcher-desc {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.8125rem !important;
+  color: var(--w-text-soft) !important;
+  background: var(--w-filename-header-bg) !important;
+  border-bottom: 1px solid var(--w-border) !important;
 }
 
 /* Copy button — same 1.75rem icon-square as .nextra-code's copy button.
@@ -1061,8 +1135,12 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
    text instead of an icon, so we suppress the text (font-size: 0) and
    inject Nextra's own clipboard SVG via mask-image; background-color
    then colors it through --w-text-soft (and --w-accent when copied).
-   Same approach swaps to the check SVG in the data-copied="true" state. */
-.api-code-switcher-copy {
+   Same approach swaps to the check SVG in the data-copied="true" state.
+   .api-endpoint-path-copy (the URL-bar copy control in EndpointMeta) shares
+   this exact icon styling so the affordance matches the request/response
+   header copy buttons; it adds only its own positioning rule below. */
+.api-code-switcher-copy,
+.api-endpoint-path-copy {
   position: relative !important;
   width: 1.75rem !important;
   height: 1.75rem !important;
@@ -1079,7 +1157,8 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
 }
 /* Icon is absolutely positioned + margin:auto centered, so the leftover
    "Copy"/"Copied" text node from the React component can't shift it. */
-.api-code-switcher-copy::before {
+.api-code-switcher-copy::before,
+.api-endpoint-path-copy::before {
   content: '' !important;
   position: absolute !important;
   inset: 0 !important;
@@ -1096,20 +1175,24 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
   mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'><rect x='9' y='9' width='13' height='13' rx='2'/><path d='M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5'/></svg>") !important;
   -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2'><rect x='9' y='9' width='13' height='13' rx='2'/><path d='M5 15H4C2.89543 15 2 14.1046 2 13V4C2 2.89543 2.89543 2 4 2H13C14.1046 2 15 2.89543 15 4V5'/></svg>") !important;
 }
-.api-code-switcher-copy:hover {
+.api-code-switcher-copy:hover,
+.api-endpoint-path-copy:hover {
   background: var(--w-border-soft) !important;
   border-color: var(--w-accent-border) !important;
   color: var(--w-text-strong) !important;
 }
-.api-code-switcher-copy[data-copied="true"] {
+.api-code-switcher-copy[data-copied="true"],
+.api-endpoint-path-copy[data-copied="true"] {
   color: var(--w-accent) !important;
   border-color: var(--w-accent-border) !important;
 }
-.api-code-switcher-copy[data-copied="true"]::before {
+.api-code-switcher-copy[data-copied="true"]::before,
+.api-endpoint-path-copy[data-copied="true"]::before {
   mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23000'><path d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'/></svg>") !important;
   -webkit-mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23000'><path d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z'/></svg>") !important;
 }
-.dark .api-code-switcher-copy {
+.dark .api-code-switcher-copy,
+.dark .api-endpoint-path-copy {
   background: var(--w-border-soft) !important;
 }
 
@@ -1121,6 +1204,9 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
   background: var(--w-bg) !important;
   border: 1px solid var(--w-border) !important;
   color: var(--w-text-soft) !important;
+  font-size: 0.75rem !important;
+  padding: 0.25rem 0.5rem !important;
+  border-radius: 0.375rem !important;
 }
 
 /* Inner code block inside the switcher/response body. The outer wrapper
@@ -1151,8 +1237,92 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
   border-radius: 0 !important;
   box-shadow: none !important;
   margin: 0 !important;
-  padding: 1rem !important;
+  /* 1rem vertical padding (matching the theme's code blocks, whose vertical
+     space comes from Nextra's internal py — our custom pres have no line
+     structure, so they need it explicitly) + the theme's 1.7 line-height. */
+  padding: 1rem 1.5rem !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.7 !important;
   background: transparent !important;
+}
+
+/* Live RequestSample body — generated (not Shiki-highlighted) code, so set the
+   mono font, color, and horizontal-scroll behavior explicitly. Padding/frame
+   come from the .api-code-switcher-body > pre rule above; this only fills in
+   what a build-time .nextra-code block would otherwise have provided. */
+.api-request-sample-pre {
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  color: var(--w-text) !important;
+  white-space: pre !important;
+  overflow-x: auto !important;
+  tab-size: 2 !important;
+}
+.api-request-sample-pre code {
+  font: inherit !important;
+  color: inherit !important;
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+}
+/* Word-wrap behaviour — toggled by the floating .api-cb-wrap button. Applies to
+   the request sample pre, the Try-it response body pre, and the Nextra code
+   inside the response-sample switcher (whose own pre/code default to no-wrap). */
+.api-request-sample-pre[data-wrap="true"],
+.api-tryit-response-body[data-wrap="true"] {
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
+.api-code-switcher-body[data-wrap="true"] pre,
+.api-code-switcher-body[data-wrap="true"] code {
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Nextra-style word-wrap toggle — floats in the upper-right of the code body and
+   reveals on hover, exactly where Nextra puts its native wrap/copy buttons
+   (rather than in our header toolbar). The custom code areas (request sample,
+   Try-it response body, response-sample switcher) host it via .api-cb-host. */
+.api-cb-host { position: relative !important; }
+.api-cb-wrap {
+  position: absolute !important;
+  top: 0.5rem !important;
+  right: 0.5rem !important;
+  z-index: 2 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 1.75rem !important;
+  height: 1.75rem !important;
+  padding: 0 !important;
+  background: var(--w-bg) !important;
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.375rem !important;
+  color: var(--w-text-soft) !important;
+  cursor: pointer !important;
+  opacity: 0 !important;
+  transition: opacity 0.15s, background 0.12s, color 0.12s, border-color 0.12s !important;
+}
+.api-cb-host:hover .api-cb-wrap,
+.api-cb-host:focus-within .api-cb-wrap,
+.api-cb-wrap:focus-visible { opacity: 1 !important; }
+.api-cb-wrap:hover {
+  background: var(--w-border-soft) !important;
+  border-color: var(--w-accent-border) !important;
+  color: var(--w-text-strong) !important;
+}
+.api-cb-wrap[data-active="true"] {
+  color: var(--w-accent) !important;
+  border-color: var(--w-accent-border) !important;
+  opacity: 1 !important;
+}
+.dark .api-cb-wrap { background: var(--w-border-soft) !important; }
+
+/* Hide Nextra's own wrap button inside the response-sample switcher — the
+   switcher provides its own copy (toolbar) and wrap (.api-cb-wrap). Scoped to
+   .nextra-code so it only hits Nextra's native button, NOT our own .api-cb-wrap
+   (which is a direct child of .api-code-switcher-body and shares the title). */
+.api-code-switcher-body .nextra-code button[title="Toggle word wrap"] {
+  display: none !important;
 }
 
 /* ─── Content section ─────────────────────────────────────────────────────
@@ -1164,13 +1334,125 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
    to match that language.
    ─────────────────────────────────────────────────────────────────────── */
 
-/* Method + path strip immediately under the H1. */
+/* "Try it" accordion shell. The endpoint identity line (method + path + the
+   Try it toggle) is the always-visible HEADER, and the TryIt form is the
+   collapsible BODY — wrapped in one rounded, bordered envelope so the header
+   and body read as a single connected unit, exactly like a filename-header
+   strip sits atop a .nextra-code block. overflow:hidden clips the body's
+   square corners to the shell's radius; the shell carries the only border. */
+.api-tryit-shell {
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.625rem !important;
+  background: var(--w-card-bg) !important;
+  box-shadow: var(--w-code-shadow) !important;
+  overflow: hidden !important;
+  margin: 0.5rem 0 1.75rem !important;
+}
+
+/* Header strip — same filename-header vocabulary as .api-code-switcher-toolbar
+   (filename-header-bg fill, flush against the body). Identity group on the
+   left, Try it toggle pushed to the right. The divider under the header only
+   appears once the body is open, so the collapsed state reads as one clean bar. */
 .api-endpoint-meta {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin: 0 !important;
+  padding: 0.625rem 0.75rem !important;
+  background: var(--w-filename-header-bg) !important;
+}
+.api-tryit-shell[data-open="true"] .api-endpoint-meta {
+  border-bottom: 1px solid var(--w-border) !important;
+}
+
+/* Identity group — a "URL bar": method pill + path on a light surface (--w-bg,
+   white in light mode), bordered and rounded like a browser address bar, with a
+   copy control pushed to the right edge. Fills the header and pushes the Try it
+   toggle to the far right. */
+.api-endpoint-target {
   display: flex !important;
   flex-wrap: wrap !important;
   align-items: center !important;
   gap: 0.625rem !important;
-  margin: -0.5rem 0 1.75rem !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding: 0.3125rem 0.3125rem 0.3125rem 0.625rem !important;
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.375rem !important;
+  background: var(--w-bg) !important;
+}
+/* Path renders as plain mono text inside the bar, not its own bordered chip.
+   Higher specificity than the .api-endpoint-path chip rule below so this wins. */
+.api-endpoint-target .api-endpoint-path {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* Copy-path control — shares the icon-square styling of the request/response
+   header copy buttons (see .api-code-switcher-copy above); only its position
+   inside the URL bar is theme-specific: pushed to the right edge. */
+.api-endpoint-path-copy {
+  margin-left: auto !important;
+}
+
+/* "Try it" toggle — primary action, so it reuses the brand accent and white
+   text exactly like .api-tryit-send. The arrow rotates 90° when expanded. */
+.api-endpoint-tryit-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  flex-shrink: 0 !important;
+  font: inherit !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: #ffffff !important;
+  background: var(--w-accent) !important;
+  border: 1px solid var(--w-accent) !important;
+  border-radius: 0.375rem !important;
+  padding: 0.375rem 0.875rem !important;
+  cursor: pointer !important;
+  transition: filter 0.12s !important;
+}
+.api-endpoint-tryit-toggle:hover  { filter: brightness(1.08) !important; }
+.api-endpoint-tryit-toggle:active { filter: brightness(0.95) !important; }
+.api-endpoint-tryit-toggle-arrow {
+  display: inline-block !important;
+  font-size: 0.625rem !important;
+  line-height: 1 !important;
+  transition: transform 0.2s ease !important;
+}
+.api-endpoint-tryit-toggle[aria-expanded="true"] .api-endpoint-tryit-toggle-arrow {
+  transform: rotate(90deg) !important;
+}
+
+/* Accordion body — collapsed by default, animates open via the
+   grid-template-rows 0fr→1fr trick so the TryIt widget stays mounted (its
+   entered auth/param values survive a collapse). The inner wrapper carries
+   overflow:hidden so the 0fr track clips the body cleanly. */
+.api-tryit-accordion {
+  display: grid !important;
+  grid-template-rows: 0fr !important;
+  transition: grid-template-rows 0.22s ease !important;
+}
+.api-tryit-shell[data-open="true"] .api-tryit-accordion {
+  grid-template-rows: 1fr !important;
+}
+.api-tryit-accordion-inner {
+  overflow: hidden !important;
+  min-height: 0 !important;
+}
+/* Inside the shell the TryIt widget is frameless — the shell already provides
+   the border, radius, fill, and shadow. Drop its card envelope and keep just
+   the inner padding so the form sits flush under the header divider. */
+.api-tryit-accordion-inner .api-tryit {
+  margin: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 1rem 1.25rem 1.25rem !important;
 }
 
 /* HTTP method pill — uppercase mono badge. Per-method hues stay separate
@@ -1201,6 +1483,51 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
 .dark .api-method-put    { color: #fbbf24 !important; background: color-mix(in srgb, #f59e0b 18%, var(--w-bg)) !important; border-color: color-mix(in srgb, #f59e0b 40%, var(--w-bg)) !important; }
 .dark .api-method-patch  { color: #c4b5fd !important; background: color-mix(in srgb, #8b5cf6 18%, var(--w-bg)) !important; border-color: color-mix(in srgb, #8b5cf6 40%, var(--w-bg)) !important; }
 .dark .api-method-delete { color: #fca5a5 !important; background: color-mix(in srgb, #ef4444 18%, var(--w-bg)) !important; border-color: color-mix(in srgb, #ef4444 40%, var(--w-bg)) !important; }
+
+/* Sidebar method chips — the CLI stamps data-api-method (full method) on each
+   API endpoint's sidebar link; we render the pill from the attribute via
+   ::before. Same semantic palette as the in-page .api-method pills, sized down
+   for the nav. Chips hug their text (variable width); DELETE is abbreviated to
+   DEL to keep it compact. */
+.nextra-sidebar a[data-api-method]::before {
+  content: attr(data-api-method);
+  flex: none !important;
+  /* Pin to the top so a title that wraps to two lines keeps the pill beside the
+     first line; the margin-top re-centers it against that first line (matching
+     the single-line look) rather than against the whole multi-line block. */
+  align-self: flex-start !important;
+  margin-top: 0.1875rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  /* Uniform slot wide enough for the longest label (PATCH); shorter ones center
+     within it, so every nav title's left edge lines up regardless of method. */
+  min-width: 2.5rem !important;
+  box-sizing: border-box !important;
+  margin-right: 0.5rem !important;
+  /* All-caps glyphs have no descenders, so they ride high in the line box even
+     with flex centering — bias the top padding to push them to optical center. */
+  padding: 0.1875rem 0.3125rem 0.0625rem !important;
+  border-radius: 0.25rem !important;
+  border: 1px solid currentColor !important;
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.5rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1 !important;
+  text-transform: uppercase !important;
+}
+.nextra-sidebar a[data-api-method="GET"]::before    { color: #047857; background: color-mix(in srgb, #10b981 12%, var(--w-bg)); border-color: color-mix(in srgb, #10b981 35%, var(--w-bg)); }
+.nextra-sidebar a[data-api-method="POST"]::before   { color: #1d4ed8; background: color-mix(in srgb, #3b82f6 12%, var(--w-bg)); border-color: color-mix(in srgb, #3b82f6 35%, var(--w-bg)); }
+.nextra-sidebar a[data-api-method="PUT"]::before    { color: #b45309; background: color-mix(in srgb, #f59e0b 14%, var(--w-bg)); border-color: color-mix(in srgb, #f59e0b 35%, var(--w-bg)); }
+.nextra-sidebar a[data-api-method="PATCH"]::before  { color: #6d28d9; background: color-mix(in srgb, #8b5cf6 12%, var(--w-bg)); border-color: color-mix(in srgb, #8b5cf6 35%, var(--w-bg)); }
+.nextra-sidebar a[data-api-method="DELETE"]::before { content: "DEL"; color: #b91c1c; background: color-mix(in srgb, #ef4444 12%, var(--w-bg)); border-color: color-mix(in srgb, #ef4444 35%, var(--w-bg)); }
+
+.dark .nextra-sidebar a[data-api-method="GET"]::before    { color: #34d399; background: color-mix(in srgb, #10b981 18%, var(--w-bg)); border-color: color-mix(in srgb, #10b981 40%, var(--w-bg)); }
+.dark .nextra-sidebar a[data-api-method="POST"]::before   { color: #60a5fa; background: color-mix(in srgb, #3b82f6 18%, var(--w-bg)); border-color: color-mix(in srgb, #3b82f6 40%, var(--w-bg)); }
+.dark .nextra-sidebar a[data-api-method="PUT"]::before    { color: #fbbf24; background: color-mix(in srgb, #f59e0b 18%, var(--w-bg)); border-color: color-mix(in srgb, #f59e0b 40%, var(--w-bg)); }
+.dark .nextra-sidebar a[data-api-method="PATCH"]::before  { color: #c4b5fd; background: color-mix(in srgb, #8b5cf6 18%, var(--w-bg)); border-color: color-mix(in srgb, #8b5cf6 40%, var(--w-bg)); }
+.dark .nextra-sidebar a[data-api-method="DELETE"]::before { color: #fca5a5; background: color-mix(in srgb, #ef4444 18%, var(--w-bg)); border-color: color-mix(in srgb, #ef4444 40%, var(--w-bg)); }
 
 /* Endpoint URL — bordered chip with the same code envelope (border + radius
    + bg) as a small nextra-code block. Scoped overrides on \`code\` because
@@ -1235,7 +1562,7 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
 .api-tryit {
   display: flex !important;
   flex-direction: column !important;
-  gap: 1rem !important;
+  gap: 1.5rem !important;
   margin: 1.25rem 0 !important;
   padding: 1.25rem !important;
   border: 1px solid var(--w-border) !important;
@@ -1257,12 +1584,14 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
   gap: 0.375rem !important;
 }
 
+/* Field label — the param/scheme name, read as a plain readable name (not the
+   shouty uppercase it shared with the section legend before). */
 .api-tryit-label {
-  font-size: 0.75rem !important;
-  font-weight: 600 !important;
-  color: var(--w-text-soft) !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
+  font-size: 0.8125rem !important;
+  font-weight: 500 !important;
+  color: var(--w-text) !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
 }
 
 /* Hint span inside the label ("path, required") — lowercase, faint. */
@@ -1292,30 +1621,154 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-accent) 18%, transparent) !important;
 }
 
+/* Single-select dropdown — the native chevron sits flush against the right edge
+   and can't be repositioned with padding, so suppress it and draw our own with
+   real inset. Excludes the multi-select listbox (no chevron there). */
+select.api-tryit-input:not([multiple]) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23687076' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 0.6875rem center !important;
+  background-size: 0.875rem !important;
+  padding-right: 2.25rem !important;
+}
+.dark select.api-tryit-input:not([multiple]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ba1a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+}
+
+/* Request-body textarea — mono (it holds JSON), themed to match the inputs. */
+.api-tryit-textarea {
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.55 !important;
+  color: var(--w-text) !important;
+  background: var(--w-bg) !important;
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.375rem !important;
+  padding: 0.625rem 0.75rem !important;
+  width: 100% !important;
+  resize: vertical !important;
+  transition: border-color 0.12s, box-shadow 0.12s !important;
+}
+.api-tryit-textarea:hover  { border-color: var(--w-accent-border) !important; }
+.api-tryit-textarea:focus  {
+  outline: none !important;
+  border-color: var(--w-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-accent) 18%, transparent) !important;
+}
+
+/* Multi-select (array-of-enum parameter) — give the list room to show a few
+   options and chip each one, rather than the cramped single-row native box. */
+.api-tryit-input-multi {
+  min-height: 5.5rem !important;
+  padding: 0.25rem !important;
+}
+.api-tryit-input-multi option {
+  padding: 0.25rem 0.375rem !important;
+  border-radius: 0.25rem !important;
+}
+
+/* Code editor (request body + object-typed params) — a highlighted <pre>
+   mirror sitting under a transparent <textarea> (see CodeEditor.tsx). The two
+   layers MUST share identical font metrics, padding and white-space so the
+   colored tokens land exactly under the typed glyphs. Themed like the inputs:
+   a bordered, rounded mono surface that lights up on focus. */
+.api-tryit-code-editor {
+  position: relative !important;
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.55 !important;
+  color: var(--w-text) !important;
+  background: var(--w-bg) !important;
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.375rem !important;
+  overflow: hidden !important;
+  transition: border-color 0.12s, box-shadow 0.12s !important;
+}
+.api-tryit-code-editor:hover { border-color: var(--w-accent-border) !important; }
+.api-tryit-code-editor:focus-within {
+  border-color: var(--w-accent) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--w-accent) 18%, transparent) !important;
+}
+.api-tryit-code-editor-pre,
+.api-tryit-code-editor-textarea {
+  margin: 0 !important;
+  padding: 0.625rem 0.75rem !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  letter-spacing: normal !important;
+  tab-size: 2 !important;
+  white-space: pre !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+}
+/* The mirror sizes the box; it never receives pointer events (the textarea is
+   the interactive layer) and clips horizontally — JS keeps its scroll in sync. */
+.api-tryit-code-editor-pre {
+  position: relative !important;
+  min-height: 100% !important;
+  color: var(--w-text) !important;
+  background: transparent !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+/* The editable layer overlays the mirror exactly; its own text is invisible so
+   only the highlighted mirror shows, but the caret + selection stay visible. */
+.api-tryit-code-editor-textarea {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  resize: none !important;
+  color: transparent !important;
+  background: transparent !important;
+  caret-color: var(--w-text) !important;
+  overflow: auto !important;
+  outline: none !important;
+}
+.api-tryit-code-editor-textarea::selection {
+  background: color-mix(in srgb, var(--w-accent) 28%, transparent) !important;
+}
+/* JSON token colors for the editor mirror — same semantic palette as the
+   response-body highlighting (a syntax-color exception to the token rule). */
+.api-tryit-code-editor .json-key     { color: hsl(220 100% 36%) !important; }
+.api-tryit-code-editor .json-string  { color: hsl(0 60% 40%) !important; }
+.api-tryit-code-editor .json-number  { color: hsl(220 80% 40%) !important; }
+.api-tryit-code-editor .json-boolean { color: hsl(220 80% 40%) !important; }
+.api-tryit-code-editor .json-null    { color: var(--w-text-faint) !important; }
+.dark .api-tryit-code-editor .json-key     { color: hsl(210 95% 75%) !important; }
+.dark .api-tryit-code-editor .json-string  { color: hsl(20 80% 70%) !important; }
+.dark .api-tryit-code-editor .json-number  { color: hsl(150 70% 65%) !important; }
+.dark .api-tryit-code-editor .json-boolean { color: hsl(150 70% 65%) !important; }
+
 /* Parameters fieldset — strip the native border and reuse it as a labelled
    section that matches the rest of the try-it layout. */
 .api-tryit-section {
   display: flex !important;
   flex-direction: column !important;
-  gap: 0.75rem !important;
+  gap: 0.875rem !important;
   padding: 0 !important;
   margin: 0 !important;
   border: none !important;
 }
+/* Section header — a small, quiet uppercase eyebrow so it groups the fields
+   without competing with the (now normal-case) field labels below it. */
 .api-tryit-section > legend {
-  font-size: 0.75rem !important;
+  font-size: 0.6875rem !important;
   font-weight: 600 !important;
   color: var(--w-text-soft) !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.04em !important;
+  letter-spacing: 0.05em !important;
   padding: 0 !important;
-  margin: 0 0 0.25rem !important;
+  margin: 0 0 0.125rem !important;
 }
 
 /* Send-request CTA — uses the brand accent so it reads as the primary
    action in the card. */
 .api-tryit-send {
-  align-self: flex-start !important;
+  align-self: flex-end !important;
   font: inherit !important;
   font-size: 0.875rem !important;
   font-weight: 500 !important;
@@ -1330,10 +1783,231 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
 .api-tryit-send:hover  { filter: brightness(1.08) !important; }
 .api-tryit-send:active { filter: brightness(0.95) !important; }
 
+/* ── Try-it response ──────────────────────────────────────────────────────
+   The status line, headers disclosure, and response body shown after a Send.
+   Re-skinned to the same vocabulary as the code blocks elsewhere (--w-border,
+   0.625rem radius, --w-code-bg body under a --w-filename-header-bg strip)
+   instead of the built-site base greyscale. */
+.api-tryit-response {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+  margin-top: 0.25rem !important;
+}
+
+/* "200 OK" status line. */
+.api-tryit-response-status {
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.875rem !important;
+  color: var(--w-text-soft) !important;
+}
+.api-tryit-response-status strong {
+  color: var(--w-text-strong) !important;
+  font-weight: 700 !important;
+}
+
+/* Body / Headers panes — frameless mono pre seated inside the shared
+   .api-code-switcher envelope. The response reuses the code-switcher (Body +
+   Headers tabs, toolbar copy, floating .api-cb-wrap), so the headers get the
+   same copy/wrap/border treatment as the body and there's no separate accordion. */
+.api-code-switcher-body .api-tryit-response-body {
+  margin: 0 !important;
+  padding: 1rem 1.5rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.8125rem !important;
+  line-height: 1.7 !important;
+  color: var(--w-text) !important;
+  overflow-x: auto !important;
+}
+
+/* Request-failed error — semantic red (same family as the delete method pill),
+   tinted via color-mix off the page surface. */
+.api-tryit-error {
+  padding: 0.625rem 0.875rem !important;
+  font-size: 0.8125rem !important;
+  border-radius: 0.5rem !important;
+  color: #b91c1c !important;
+  background: color-mix(in srgb, #ef4444 8%, var(--w-bg)) !important;
+  border: 1px solid color-mix(in srgb, #ef4444 30%, var(--w-bg)) !important;
+}
+.dark .api-tryit-error {
+  color: #fca5a5 !important;
+  background: color-mix(in srgb, #ef4444 14%, var(--w-bg)) !important;
+  border-color: color-mix(in srgb, #ef4444 38%, var(--w-bg)) !important;
+}
+
+/* ── Request history ──────────────────────────────────────────────────────
+   Local (localStorage) log of sent requests at the bottom of the Try it panel.
+   Each row shows method + URL + timestamp and expands to reveal headers + body. */
+.api-tryit-history {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.5rem !important;
+}
+.api-tryit-history-head {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+.api-tryit-history-title {
+  font-size: 0.6875rem !important;
+  font-weight: 600 !important;
+  color: var(--w-text-soft) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+.api-tryit-history-clear {
+  font: inherit !important;
+  font-size: 0.75rem !important;
+  color: var(--w-text-soft) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+  transition: color 0.12s !important;
+}
+.api-tryit-history-clear:hover { color: var(--w-accent) !important; }
+.api-tryit-history-list {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.375rem !important;
+}
+.api-tryit-history-item {
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.5rem !important;
+  background: var(--w-card-bg) !important;
+  overflow: hidden !important;
+}
+.api-tryit-history-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  width: 100% !important;
+  padding: 0.5rem 0.625rem !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  text-align: left !important;
+  font: inherit !important;
+  color: var(--w-text) !important;
+  transition: background 0.12s !important;
+}
+.api-tryit-history-row:hover { background: var(--w-hover-bg) !important; }
+.api-tryit-history-url {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.75rem !important;
+  color: var(--w-text) !important;
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+/* Time sits just before the status pill; the pill is the last item so it stays
+   flush-right and aligned across rows without needing a fixed-width time slot. */
+.api-tryit-history-time {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  font-size: 0.6875rem !important;
+  color: var(--w-text-faint) !important;
+}
+/* Response status badge on the history row — small outlined chip, colored by
+   status family (same semantic palette as the method pills). */
+.api-tryit-history-status {
+  flex-shrink: 0 !important;
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.6875rem !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  padding: 0.0625rem 0.375rem !important;
+  border-radius: 0.25rem !important;
+  border: 1px solid currentColor !important;
+}
+.api-tryit-history-status.api-status-2xx { color: #047857 !important; }
+.api-tryit-history-status.api-status-3xx { color: #1d4ed8 !important; }
+.api-tryit-history-status.api-status-4xx { color: #b45309 !important; }
+.api-tryit-history-status.api-status-5xx,
+.api-tryit-history-status.api-status-err { color: #b91c1c !important; }
+.dark .api-tryit-history-status.api-status-2xx { color: #34d399 !important; }
+.dark .api-tryit-history-status.api-status-3xx { color: #60a5fa !important; }
+.dark .api-tryit-history-status.api-status-4xx { color: #fbbf24 !important; }
+.dark .api-tryit-history-status.api-status-5xx,
+.dark .api-tryit-history-status.api-status-err { color: #fca5a5 !important; }
+.api-tryit-history-detail {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+  padding: 0.75rem !important;
+  border-top: 1px solid var(--w-border-soft) !important;
+}
+/* The Request/Response code-switchers inside a history entry are snug — the
+   detail's own gap + padding provide the spacing. */
+.api-tryit-history-detail .api-code-switcher {
+  margin: 0 !important;
+}
+/* Per-entry expand animation — grid-template-rows 0fr→1fr (the detail stays
+   mounted so it can animate), matching the Try it shell accordion. */
+.api-tryit-history-accordion {
+  display: grid !important;
+  grid-template-rows: 0fr !important;
+  transition: grid-template-rows 0.22s ease !important;
+}
+.api-tryit-history-item[data-open="true"] .api-tryit-history-accordion {
+  grid-template-rows: 1fr !important;
+}
+.api-tryit-history-accordion-inner {
+  overflow: hidden !important;
+  min-height: 0 !important;
+}
+/* "Waiting for response…" placeholder while a history request is in flight. */
+.api-tryit-history-pending {
+  font-size: 0.8125rem !important;
+  color: var(--w-text-soft) !important;
+}
+.api-tryit-history-label {
+  font-size: 0.625rem !important;
+  font-weight: 600 !important;
+  color: var(--w-text-soft) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  margin-top: 0.25rem !important;
+}
+.api-tryit-history-block {
+  margin: 0 !important;
+  padding: 0.625rem 0.75rem !important;
+  background: var(--w-code-bg) !important;
+  border: 1px solid var(--w-border) !important;
+  border-radius: 0.375rem !important;
+  font-family: var(--w-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace) !important;
+  font-size: 0.75rem !important;
+  line-height: 1.5 !important;
+  color: var(--w-text) !important;
+  overflow-x: auto !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+}
+
 /* "No authentication required" — soft body copy, not a callout. */
 .api-auth-none {
   font-size: 0.875rem !important;
   color: var(--w-text-soft) !important;
+  margin: 0.5rem 0 1.5rem !important;
+}
+
+/* Authentication — rendered as a table so it inherits the same article-table
+   styling as the Parameters tables (header underline, row dividers, hover, the
+   accent inline-code chip on the scheme name). Only the top margin is tuned so
+   it sits closer under the "Authentication" heading. */
+.api-auth-table {
   margin: 0.5rem 0 1.5rem !important;
 }
 
@@ -1368,7 +2042,16 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
 .api-schema-root,
 .api-schema-children {
   list-style: none !important;
-  padding: 0 !important;
+  margin: 0 !important;
+}
+.api-schema-root { padding: 0 !important; }
+/* Nested properties indent under their parent so an expanded object reads as
+   nested rather than flat — indentation only, no guide lines (those are hard to
+   keep aligned across levels). (The component's inline depth padding is killed
+   by .api-schema-row's !important padding, so indentation is driven here, one
+   step per nesting level.) */
+.api-schema-children {
+  padding: 0 0 0 2rem !important;
   margin: 0 !important;
 }
 .api-schema-row {
@@ -1432,6 +2115,18 @@ article:has(.api-endpoint-grid) > div.nextra-border:not(:has(> a)) {
   font-size: 0.8125rem !important;
   line-height: 1.5 !important;
   color: var(--w-text-soft) !important;
+}
+
+/* Content-side Response tabs reuse the .api-code-switcher envelope/tabs/desc,
+   but the body holds the schema tree, not code — so the envelope fill is the
+   page surface (--w-bg, white in light mode) instead of the code-block surface.
+   The toolbar and description bands keep their own --w-filename-header-bg. */
+.api-response-tabs {
+  background: var(--w-bg) !important;
+}
+.api-response-tabs .api-schema-block {
+  background: transparent !important;
+  padding: 0.75rem 1rem !important;
 }
 
 /* Response-status hue per 2xx/3xx/4xx/5xx family — pairs with the existing

@@ -4,3 +4,4 @@
 *.jolli
 *.gemini
 *.claude
+.DS_Store
